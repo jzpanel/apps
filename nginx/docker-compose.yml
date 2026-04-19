@@ -12,6 +12,7 @@ services:
       - /www/server/nginx/conf.d:/etc/nginx/conf.d
       - /www/server/nginx/conf/vhost:/etc/nginx/conf/vhost
       - /www/logs/nginx:/www/logs/nginx
+      - /www/wwwlogs:/www/wwwlogs
       - /www/server/nginx/ssl:/etc/nginx/ssl
     networks:
       - panel_network
