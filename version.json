@@ -1,0 +1,5 @@
+﻿{
+  "version": "1.0.1",
+  "updated_at": "2026-04-19T10:00:00Z",
+  "changelog": "初始版本，包含 12 个官方应用：Nginx、Apache、OpenResty、MySQL、PostgreSQL、Redis、MongoDB、phpMyAdmin、pgweb、Mongo Express、Pure-FTPd、WordPress"
+}
