@@ -49,6 +49,12 @@ compose_vars:
     template: "panel_mysql"
     empty_value: "panel_mysql"
 
+db_init:
+  registry_type: mysql
+  db_name_param: db_name
+  db_user_param: db_user
+  db_password_param: db_password
+
 manage:
   - key: PHP_MEMORY_LIMIT
     label: PHP 内存限制
