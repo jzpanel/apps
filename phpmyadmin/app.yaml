@@ -1,0 +1,123 @@
+key: phpmyadmin
+name: phpMyAdmin
+category: tools
+description: MySQL/MariaDB 的 Web 管理界面，支持数据库管理、SQL 执行、数据导入导出
+source: official
+icon: icon.svg
+versions:
+  - "5.2"
+  - "5.1"
+default_version: "5.2"
+has_web_ui: true
+health_check_timeout: 30
+dependencies:
+  - mysql
+
+params:
+  - key: port
+    label: 访问端口
+    type: number
+    default: 8080
+    required: true
+
+compose_vars:
+  - placeholder: "{{pma_host}}"
+    source: registry_password
+    registry_type: mysql
+    template: "panel_mysql"
+    empty_value: "panel_mysql"
+
+manage:
+  - key: PMA_ABSOLUTE_URI
+    label: 访问地址（可选）
+    type: text
+    description: 如果通过反向代理访问，填写完整 URL，如 https://pma.example.com
+    restart_required: true
+    file_path: /www/server/phpmyadmin/config.user.inc.php
+    ini_section: php
+
+  - key: blowfish_secret
+    label: Cookie 加密密钥
+    type: password
+    description: 用于加密 Cookie 的随机字符串，建议 32 位以上
+    restart_required: true
+    file_path: /www/server/phpmyadmin/config.user.inc.php
+    ini_section: php
+
+  - key: LoginCookieValidity
+    label: 登录 Cookie 有效期（秒）
+    type: number
+    description: 登录状态保持时间，默认 1440（24分钟）
+    restart_required: false
+    file_path: /www/server/phpmyadmin/config.user.inc.php
+    ini_section: php
+
+  - key: MaxRows
+    label: 每页显示行数
+    type: select
+    description: 浏览表数据时每页显示的行数
+    options:
+      - value: "25"
+        label: "25"
+      - value: "50"
+        label: "50（推荐）"
+      - value: "100"
+        label: "100"
+      - value: "250"
+        label: "250"
+    restart_required: false
+    file_path: /www/server/phpmyadmin/config.user.inc.php
+    ini_section: php
+
+  - key: MemoryLimit
+    label: PHP 内存限制
+    type: select
+    description: phpMyAdmin 进程可使用的最大内存
+    options:
+      - value: 128M
+        label: 128M（默认）
+      - value: 256M
+        label: 256M（推荐）
+      - value: 512M
+        label: 512M（大数据库）
+    restart_required: true
+    file_path: /www/server/phpmyadmin/config.user.inc.php
+    ini_section: php
+
+  - key: ExecTimeLimit
+    label: 脚本执行超时（秒）
+    type: number
+    description: 导入大文件时需要增大此值，0 表示不限制
+    restart_required: false
+    file_path: /www/server/phpmyadmin/config.user.inc.php
+    ini_section: php
+
+  - key: UploadDir
+    label: 上传目录
+    type: text
+    description: 服务器端上传目录，用于导入大文件，留空禁用
+    restart_required: false
+    file_path: /www/server/phpmyadmin/config.user.inc.php
+    ini_section: php
+
+actions:
+  - id: clear_session
+    label: 清理会话
+    icon: trash
+    confirm: true
+    danger: false
+    exec: "find /tmp -name 'phpMyAdmin*' -delete 2>/dev/null; echo '会话已清理'"
+
+install_hints:
+  - "通过浏览器访问 http://服务器IP:端口 进入管理界面"
+  - "使用 MySQL root 账号登录"
+
+install_guide:
+  description: "phpMyAdmin 已安装，可以通过浏览器管理 MySQL 数据库："
+  features:
+    - "数据库管理 - 创建、删除、修改数据库和表"
+    - "SQL 执行 - 直接执行 SQL 语句"
+    - "数据导入导出 - 支持 SQL、CSV 等格式"
+  primary_action:
+    label: "打开 phpMyAdmin"
+    route: "/apps"

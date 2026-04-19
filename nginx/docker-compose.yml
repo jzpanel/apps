@@ -1,0 +1,21 @@
+services:
+  nginx:
+    image: nginx:{{version}}
+    container_name: panel_nginx
+    restart: unless-stopped
+    ports:
+      - "{{http_port}}:80"
+      - "{{https_port}}:443"
+    volumes:
+      - /www/wwwroot:/www/wwwroot
+      - /www/server/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /www/server/nginx/conf.d:/etc/nginx/conf.d
+      - /www/logs/nginx:/www/logs/nginx
+      - /www/server/nginx/ssl:/etc/nginx/ssl
+    networks:
+      - panel_network
+
+networks:
+  panel_network:
+    external: true
+    name: panel_network

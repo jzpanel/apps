@@ -1,0 +1,23 @@
+services:
+  pureftpd:
+    image: stilliard/pure-ftpd:{{version}}
+    container_name: panel_pureftpd
+    restart: unless-stopped
+    ports:
+      - "{{ftp_port}}:21"
+      - "{{passive_port_start}}-{{passive_port_end}}:{{passive_port_start}}-{{passive_port_end}}"
+    environment:
+      PUBLICHOST: "0.0.0.0"
+      FTP_PASSIVE_PORTS: "{{passive_port_start}}:{{passive_port_end}}"
+    volumes:
+      - /www/wwwroot:/home/ftpusers
+      - /www/server/pureftpd/pure-ftpd.conf:/etc/pure-ftpd/pure-ftpd.conf:ro
+      - /www/server/pureftpd/passwd:/etc/pure-ftpd/passwd
+      - /www/server/pureftpd/ssl:/etc/ssl/private
+    networks:
+      - panel_network
+
+networks:
+  panel_network:
+    external: true
+    name: panel_network

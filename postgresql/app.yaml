@@ -1,0 +1,219 @@
+key: postgresql
+name: PostgreSQL
+category: database
+description: 功能强大的开源对象关系型数据库，支持复杂查询、JSON、全文搜索
+source: official
+icon: icon.svg
+versions:
+  - "17"
+  - "16"
+  - "15"
+  - "14"
+default_version: "16"
+service_type: database
+db_type: pgsql
+has_web_ui: false
+health_check_timeout: 60
+
+params:
+  - key: port
+    label: 端口
+    type: number
+    default: 5432
+    required: true
+  - key: db_password
+    label: postgres 用户密码
+    type: password
+    default: ""
+    required: true
+    auto_generate: true
+
+manage:
+  - key: max_connections
+    label: 最大连接数
+    type: number
+    description: 允许的最大客户端连接数（每连接约 5-10MB）
+    restart_required: true
+    file_path: /www/server/postgresql/postgresql.conf
+    ini_section: connections
+
+  - key: shared_buffers
+    label: 共享缓冲区大小
+    type: select
+    description: 建议设为系统内存的 25%，PostgreSQL 最重要的性能参数
+    options:
+      - value: 128MB
+        label: 128MB（1GB 内存）
+      - value: 256MB
+        label: 256MB（推荐 2GB+）
+      - value: 512MB
+        label: 512MB（推荐 4GB+）
+      - value: 1GB
+        label: 1GB（推荐 8GB+）
+      - value: 2GB
+        label: 2GB（推荐 16GB+）
+    restart_required: true
+    file_path: /www/server/postgresql/postgresql.conf
+    ini_section: memory
+
+  - key: work_mem
+    label: 排序操作内存
+    type: select
+    description: 每个排序/哈希操作使用的内存，注意：max_connections × work_mem 不能超过总内存
+    options:
+      - value: 4MB
+        label: 4MB（默认）
+      - value: 8MB
+        label: 8MB
+      - value: 16MB
+        label: 16MB（推荐）
+      - value: 32MB
+        label: 32MB
+      - value: 64MB
+        label: 64MB（复杂查询）
+    restart_required: false
+    file_path: /www/server/postgresql/postgresql.conf
+    ini_section: memory
+
+  - key: maintenance_work_mem
+    label: 维护操作内存
+    type: select
+    description: VACUUM、CREATE INDEX 等维护操作使用的内存
+    options:
+      - value: 64MB
+        label: 64MB（默认）
+      - value: 128MB
+        label: 128MB（推荐）
+      - value: 256MB
+        label: 256MB
+      - value: 512MB
+        label: 512MB（大表维护）
+    restart_required: false
+    file_path: /www/server/postgresql/postgresql.conf
+    ini_section: memory
+
+  - key: effective_cache_size
+    label: 有效缓存大小估算
+    type: select
+    description: 告知查询优化器可用的缓存大小，建议设为系统内存的 75%
+    options:
+      - value: 512MB
+        label: 512MB（1GB 内存）
+      - value: 1GB
+        label: 1GB（2GB 内存）
+      - value: 2GB
+        label: 2GB（4GB 内存）
+      - value: 4GB
+        label: 4GB（8GB 内存）
+      - value: 8GB
+        label: 8GB（16GB 内存）
+    restart_required: false
+    file_path: /www/server/postgresql/postgresql.conf
+    ini_section: query
+
+  - key: log_min_duration_statement
+    label: 慢查询阈值（毫秒）
+    type: number
+    description: 超过此时间的查询记录到日志，-1 禁用，0 记录所有查询
+    restart_required: false
+    file_path: /www/server/postgresql/postgresql.conf
+    ini_section: logging
+
+  - key: log_connections
+    label: 记录连接日志
+    type: switch
+    description: 记录每次客户端连接，调试时有用，生产环境建议关闭
+    restart_required: false
+    file_path: /www/server/postgresql/postgresql.conf
+    ini_section: logging
+
+  - key: log_disconnections
+    label: 记录断开日志
+    type: switch
+    description: 记录每次客户端断开连接
+    restart_required: false
+    file_path: /www/server/postgresql/postgresql.conf
+    ini_section: logging
+
+  - key: wal_level
+    label: WAL 日志级别
+    type: select
+    description: minimal=最小，replica=支持流复制（推荐），logical=支持逻辑复制
+    options:
+      - value: replica
+        label: replica（推荐）
+      - value: minimal
+        label: minimal（最小）
+      - value: logical
+        label: logical（逻辑复制）
+    restart_required: true
+    file_path: /www/server/postgresql/postgresql.conf
+    ini_section: wal
+
+  - key: checkpoint_completion_target
+    label: Checkpoint 完成目标
+    type: select
+    description: 控制 checkpoint 写入的平滑程度，0.9 表示在下次 checkpoint 前 90% 时间内完成
+    options:
+      - value: "0.5"
+        label: "0.5（默认）"
+      - value: "0.9"
+        label: "0.9（推荐，减少 I/O 峰值）"
+    restart_required: false
+    file_path: /www/server/postgresql/postgresql.conf
+    ini_section: wal
+
+actions:
+  - id: reload
+    label: 重载配置
+    icon: refresh
+    confirm: false
+    danger: false
+    exec: "psql -U postgres -c 'SELECT pg_reload_conf();'"
+
+  - id: vacuum_analyze
+    label: VACUUM ANALYZE
+    icon: clean
+    confirm: true
+    danger: false
+    exec: "psql -U postgres -c 'VACUUM ANALYZE;'"
+
+  - id: show_connections
+    label: 查看当前连接
+    icon: list
+    confirm: false
+    danger: false
+    exec: "psql -U postgres -c 'SELECT pid, usename, application_name, client_addr, state, query_start FROM pg_stat_activity ORDER BY query_start DESC LIMIT 20;'"
+
+  - id: show_db_size
+    label: 查看数据库大小
+    icon: info
+    confirm: false
+    danger: false
+    exec: "psql -U postgres -c 'SELECT datname, pg_size_pretty(pg_database_size(datname)) AS size FROM pg_database ORDER BY pg_database_size(datname) DESC;'"
+
+  - id: show_slow_queries
+    label: 查看慢查询统计
+    icon: clock
+    confirm: false
+    danger: false
+    exec: "psql -U postgres -c 'SELECT query, calls, total_exec_time, mean_exec_time FROM pg_stat_statements ORDER BY mean_exec_time DESC LIMIT 10;' 2>/dev/null || echo 'pg_stat_statements 扩展未启用'"
+
+init_files:
+  - path: /www/server/postgresql/postgresql.conf
+    file: init/postgresql.conf
+  - path: /www/server/postgresql/pg_hba.conf
+    file: init/pg_hba.conf
+
+install_hints:
+  - "数据库管理 → 可以创建和管理 PostgreSQL 数据库"
+  - "计划任务 → 可以设置数据库自动备份"
+
+install_guide:
+  description: "已自动注册为默认 PostgreSQL 服务，现在可以在以下模块中使用："
+  features:
+    - "数据库管理 - 创建和管理 PostgreSQL 数据库"
+    - "计划任务 - 设置数据库自动备份"
+  primary_action:
+    label: "前往数据库管理"
+    route: "/database"

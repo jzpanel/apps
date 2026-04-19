@@ -1,0 +1,26 @@
+services:
+  wordpress:
+    image: wordpress:{{version}}-php8.2-apache
+    container_name: panel_wordpress
+    restart: unless-stopped
+    ports:
+      - "{{port}}:80"
+    environment:
+      WORDPRESS_DB_HOST: "{{mysql_host}}:3306"
+      WORDPRESS_DB_NAME: "{{db_name}}"
+      WORDPRESS_DB_USER: "{{db_user}}"
+      WORDPRESS_DB_PASSWORD: "{{db_password}}"
+      WORDPRESS_TABLE_PREFIX: "{{table_prefix}}"
+      PHP_MEMORY_LIMIT: 256M
+      UPLOAD_MAX_FILESIZE: 64M
+      POST_MAX_SIZE: 128M
+    volumes:
+      - /www/server/wordpress/html:/var/www/html
+      - /www/server/wordpress/php.ini:/usr/local/etc/php/conf.d/custom.ini:ro
+    networks:
+      - panel_network
+
+networks:
+  panel_network:
+    external: true
+    name: panel_network

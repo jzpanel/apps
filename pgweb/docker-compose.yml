@@ -1,0 +1,16 @@
+services:
+  pgweb:
+    image: sosedoff/pgweb:{{version}}
+    container_name: panel_pgweb
+    restart: unless-stopped
+    ports:
+      - "{{port}}:8081"
+    environment:
+      DATABASE_URL: "{{pgweb_db_url}}"
+    networks:
+      - panel_network
+
+networks:
+  panel_network:
+    external: true
+    name: panel_network

@@ -1,0 +1,142 @@
+key: pureftpd
+name: Pure-FTPd
+category: tools
+description: 安全、高效的 FTP 服务器，支持虚拟用户、TLS 加密、带宽限制
+source: official
+icon: icon.svg
+versions:
+  - "1.0"
+default_version: "1.0"
+has_web_ui: false
+health_check_timeout: 30
+
+params:
+  - key: ftp_port
+    label: FTP 端口
+    type: number
+    default: 21
+    required: true
+  - key: passive_port_start
+    label: 被动模式端口起始
+    type: number
+    default: 30000
+    required: true
+  - key: passive_port_end
+    label: 被动模式端口结束
+    type: number
+    default: 30100
+    required: true
+
+manage:
+  - key: MaxClientsNumber
+    label: 最大客户端连接数
+    type: number
+    description: 同时允许的最大 FTP 连接数
+    restart_required: true
+    file_path: /www/server/pureftpd/pure-ftpd.conf
+    ini_section: global
+
+  - key: MaxClientsPerIP
+    label: 每 IP 最大连接数
+    type: number
+    description: 单个 IP 允许的最大并发连接数，防止滥用
+    restart_required: true
+    file_path: /www/server/pureftpd/pure-ftpd.conf
+    ini_section: global
+
+  - key: TLS
+    label: TLS 加密
+    type: select
+    description: "0=禁用，1=允许 TLS 和非 TLS，2=强制 TLS（推荐）"
+    options:
+      - value: "0"
+        label: "0（禁用 TLS）"
+      - value: "1"
+        label: "1（允许 TLS 和非 TLS）"
+      - value: "2"
+        label: "2（强制 TLS，推荐）"
+    restart_required: true
+    file_path: /www/server/pureftpd/pure-ftpd.conf
+    ini_section: global
+
+  - key: AnonymousOnly
+    label: 仅允许匿名访问
+    type: switch
+    description: 开启后只允许匿名用户，关闭则允许认证用户
+    restart_required: true
+    file_path: /www/server/pureftpd/pure-ftpd.conf
+    ini_section: global
+
+  - key: NoAnonymous
+    label: 禁止匿名访问
+    type: switch
+    description: 开启后禁止匿名用户登录（推荐生产环境开启）
+    restart_required: true
+    file_path: /www/server/pureftpd/pure-ftpd.conf
+    ini_section: global
+
+  - key: MaxDiskUsage
+    label: 磁盘使用率上限（%）
+    type: number
+    description: 磁盘使用率超过此值时拒绝上传，0 表示不限制
+    restart_required: true
+    file_path: /www/server/pureftpd/pure-ftpd.conf
+    ini_section: global
+
+  - key: MaxIdleTime
+    label: 空闲超时（分钟）
+    type: number
+    description: 连接空闲超过此时间自动断开
+    restart_required: true
+    file_path: /www/server/pureftpd/pure-ftpd.conf
+    ini_section: global
+
+  - key: BandwidthThrottling
+    label: 带宽限制（KB/s）
+    type: number
+    description: 每个连接的最大传输速率，0 表示不限制
+    restart_required: true
+    file_path: /www/server/pureftpd/pure-ftpd.conf
+    ini_section: global
+
+  - key: Umask
+    label: 文件权限掩码
+    type: text
+    description: "上传文件的默认权限，格式：文件掩码:目录掩码，如 133:022"
+    restart_required: true
+    file_path: /www/server/pureftpd/pure-ftpd.conf
+    ini_section: global
+
+actions:
+  - id: list_users
+    label: 查看虚拟用户
+    icon: list
+    confirm: false
+    danger: false
+    exec: "pure-pw list 2>/dev/null || echo '暂无虚拟用户'"
+
+  - id: reload
+    label: 重载配置
+    icon: refresh
+    confirm: false
+    danger: false
+    exec: "kill -HUP $(cat /var/run/pure-ftpd.pid 2>/dev/null) 2>/dev/null && echo '配置已重载' || echo '重载失败，请重启服务'"
+
+init_files:
+  - path: /www/server/pureftpd/pure-ftpd.conf
+    file: init/pure-ftpd.conf
+
+install_hints:
+  - "FTP 服务已启动，使用 FTP 客户端连接服务器 IP:21"
+  - "建议开启 TLS 加密，避免密码明文传输"
+  - "防火墙需要开放 FTP 端口和被动模式端口范围"
+
+install_guide:
+  description: "Pure-FTPd 已安装，可以通过 FTP 客户端连接："
+  features:
+    - "虚拟用户 - 支持独立的 FTP 用户管理"
+    - "TLS 加密 - 支持 FTPS 安全传输"
+    - "带宽限制 - 可限制每个连接的传输速率"
+  primary_action:
+    label: "查看应用详情"
+    route: "/apps"

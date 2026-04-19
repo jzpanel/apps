@@ -1,0 +1,22 @@
+services:
+  mongodb:
+    image: mongo:{{version}}
+    container_name: panel_mongodb
+    restart: unless-stopped
+    ports:
+      - "{{port}}:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: "{{root_password}}"
+    volumes:
+      - /www/server/mongodb/data:/data/db
+      - /www/server/mongodb/mongod.conf:/etc/mongod.conf:ro
+      - /www/logs/mongodb:/var/log/mongodb
+    command: mongod --config /etc/mongod.conf
+    networks:
+      - panel_network
+
+networks:
+  panel_network:
+    external: true
+    name: panel_network

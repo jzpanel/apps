@@ -1,0 +1,19 @@
+services:
+  redis:
+    image: redis:{{version}}-alpine
+    container_name: panel_redis
+    restart: unless-stopped
+    ports:
+      - "{{port}}:6379"
+    command: redis-server /etc/redis/redis.conf{{redis_auth_cmd}}
+    volumes:
+      - /www/server/redis/data:/data
+      - /www/server/redis/redis.conf:/etc/redis/redis.conf:ro
+      - /www/logs/redis:/var/log/redis
+    networks:
+      - panel_network
+
+networks:
+  panel_network:
+    external: true
+    name: panel_network

@@ -1,0 +1,67 @@
+key: pgweb
+name: pgweb
+category: tools
+description: PostgreSQL 的轻量级 Web 客户端，支持 SQL 执行、数据浏览、导出
+source: official
+icon: icon.svg
+versions:
+  - "0.15"
+  - "0.14"
+default_version: "0.15"
+has_web_ui: true
+health_check_timeout: 30
+dependencies:
+  - postgresql
+
+params:
+  - key: port
+    label: 访问端口
+    type: number
+    default: 8082
+    required: true
+
+compose_vars:
+  - placeholder: "{{pgweb_db_url}}"
+    source: registry_password
+    registry_type: postgresql
+    template: "postgres://{{username}}:{{password}}@panel_postgresql:5432/postgres?sslmode=disable"
+    empty_value: "postgres://postgres@panel_postgresql:5432/postgres?sslmode=disable"
+
+manage:
+  - key: PGWEB_AUTH_USER
+    label: Web 界面用户名（可选）
+    type: text
+    description: 设置后需要登录才能访问，留空则无需登录（不建议公网暴露）
+    restart_required: true
+    file_path: /www/server/pgweb/.env
+    ini_section: env
+
+  - key: PGWEB_AUTH_PASS
+    label: Web 界面密码
+    type: password
+    description: 配合用户名使用
+    restart_required: true
+    file_path: /www/server/pgweb/.env
+    ini_section: env
+
+actions:
+  - id: restart
+    label: 重启服务
+    icon: refresh
+    confirm: false
+    danger: false
+    exec: "echo '请在面板顶部点击重启按钮'"
+
+install_hints:
+  - "通过浏览器访问 http://服务器IP:端口 进入管理界面"
+  - "建议通过反向代理并配置 HTTPS 后再公网访问"
+
+install_guide:
+  description: "pgweb 已安装，可以通过浏览器管理 PostgreSQL："
+  features:
+    - "SQL 执行 - 直接执行 SQL 语句"
+    - "数据浏览 - 查看表结构和数据"
+    - "数据导出 - 导出查询结果为 CSV"
+  primary_action:
+    label: "打开 pgweb"
+    route: "/apps"

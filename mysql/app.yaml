@@ -1,0 +1,205 @@
+key: mysql
+name: MySQL
+category: database
+description: 世界上最流行的开源关系型数据库，稳定可靠，生态完善
+source: official
+icon: icon.svg
+versions:
+  - "8.4"
+  - "8.0"
+  - "5.7"
+default_version: "8.4"
+service_type: database
+db_type: mysql
+has_web_ui: false
+health_check_timeout: 60
+
+params:
+  - key: port
+    label: 端口
+    type: number
+    default: 3306
+    required: true
+  - key: root_password
+    label: Root 密码
+    type: password
+    default: ""
+    required: true
+    auto_generate: true
+
+manage:
+  - key: max_connections
+    label: 最大连接数
+    type: number
+    description: 允许的最大客户端连接数，根据内存调整（每连接约 1MB）
+    restart_required: true
+    file_path: /www/server/mysql/my.cnf
+    ini_section: mysqld
+
+  - key: innodb_buffer_pool_size
+    label: InnoDB 缓冲池大小
+    type: select
+    description: 建议设为可用内存的 70-80%，对性能影响最大
+    options:
+      - value: 128M
+        label: 128M（1GB 内存服务器）
+      - value: 256M
+        label: 256M
+      - value: 512M
+        label: 512M（推荐 2GB+）
+      - value: 1G
+        label: 1G（推荐 4GB+）
+      - value: 2G
+        label: 2G（推荐 8GB+）
+      - value: 4G
+        label: 4G（推荐 16GB+）
+    restart_required: true
+    file_path: /www/server/mysql/my.cnf
+    ini_section: mysqld
+
+  - key: innodb_log_file_size
+    label: InnoDB 日志文件大小
+    type: select
+    description: 较大的值提升写入性能，但崩溃恢复更慢
+    options:
+      - value: 48M
+        label: 48M（默认）
+      - value: 128M
+        label: 128M
+      - value: 256M
+        label: 256M（推荐）
+      - value: 512M
+        label: 512M（高写入场景）
+    restart_required: true
+    file_path: /www/server/mysql/my.cnf
+    ini_section: mysqld
+
+  - key: max_allowed_packet
+    label: 最大数据包大小
+    type: select
+    description: 限制单次查询/插入的最大数据量
+    options:
+      - value: 16M
+        label: 16M（默认）
+      - value: 32M
+        label: 32M
+      - value: 64M
+        label: 64M（推荐）
+      - value: 128M
+        label: 128M
+      - value: 256M
+        label: 256M（大文件场景）
+    restart_required: false
+    file_path: /www/server/mysql/my.cnf
+    ini_section: mysqld
+
+  - key: character_set_server
+    label: 默认字符集
+    type: select
+    description: 新建数据库的默认字符集
+    options:
+      - value: utf8mb4
+        label: utf8mb4（推荐，支持 emoji）
+      - value: utf8
+        label: utf8
+      - value: latin1
+        label: latin1
+    restart_required: true
+    file_path: /www/server/mysql/my.cnf
+    ini_section: mysqld
+
+  - key: slow_query_log
+    label: 慢查询日志
+    type: switch
+    description: 记录执行时间超过阈值的查询，用于性能分析
+    restart_required: false
+    file_path: /www/server/mysql/my.cnf
+    ini_section: mysqld
+
+  - key: long_query_time
+    label: 慢查询阈值（秒）
+    type: number
+    description: 超过此时间的查询记录到慢查询日志
+    restart_required: false
+    file_path: /www/server/mysql/my.cnf
+    ini_section: mysqld
+
+  - key: query_cache_size
+    label: 查询缓存大小
+    type: select
+    description: MySQL 8.0 已移除查询缓存，仅 5.7 有效
+    options:
+      - value: "0"
+        label: 禁用（推荐）
+      - value: 32M
+        label: 32M
+      - value: 64M
+        label: 64M
+      - value: 128M
+        label: 128M
+    restart_required: true
+    file_path: /www/server/mysql/my.cnf
+    ini_section: mysqld
+
+  - key: innodb_flush_log_at_trx_commit
+    label: 事务日志刷新策略
+    type: select
+    description: "1=最安全（每次提交刷盘），2=性能与安全平衡，0=最高性能（有丢数据风险）"
+    options:
+      - value: "1"
+        label: "1（最安全，推荐生产）"
+      - value: "2"
+        label: "2（平衡）"
+      - value: "0"
+        label: "0（最高性能，有风险）"
+    restart_required: false
+    file_path: /www/server/mysql/my.cnf
+    ini_section: mysqld
+
+actions:
+  - id: flush_privileges
+    label: 刷新权限
+    icon: refresh
+    confirm: false
+    danger: false
+    exec: "mysql -u root -p$MYSQL_ROOT_PASSWORD -e 'FLUSH PRIVILEGES;'"
+
+  - id: flush_slow_log
+    label: 清空慢查询日志
+    icon: trash
+    confirm: true
+    danger: false
+    exec: "mysql -u root -p$MYSQL_ROOT_PASSWORD -e 'FLUSH SLOW LOGS;'"
+
+  - id: show_processlist
+    label: 查看当前连接
+    icon: list
+    confirm: false
+    danger: false
+    exec: "mysql -u root -p$MYSQL_ROOT_PASSWORD -e 'SHOW PROCESSLIST;'"
+
+  - id: show_status
+    label: 查看运行状态
+    icon: info
+    confirm: false
+    danger: false
+    exec: "mysql -u root -p$MYSQL_ROOT_PASSWORD -e 'SHOW GLOBAL STATUS LIKE \"%Connections%\";SHOW GLOBAL STATUS LIKE \"%Queries%\";'"
+
+init_files:
+  - path: /www/server/mysql/my.cnf
+    file: init/my.cnf
+
+install_hints:
+  - "数据库管理 → 可以创建和管理 MySQL 数据库"
+  - "计划任务 → 可以设置数据库自动备份"
+  - "网站管理 → 创建网站时可配置数据库连接"
+
+install_guide:
+  description: "已自动注册为默认 MySQL 服务，现在可以在以下模块中使用："
+  features:
+    - "数据库管理 - 创建和管理 MySQL 数据库"
+    - "计划任务 - 设置数据库自动备份"
+    - "网站管理 - 为网站配置数据库连接"
+  primary_action:
+    label: "前往数据库管理"
+    route: "/database"

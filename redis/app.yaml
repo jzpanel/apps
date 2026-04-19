@@ -1,0 +1,195 @@
+key: redis
+name: Redis
+category: database
+description: 高性能内存键值数据库，支持多种数据结构，常用于缓存、会话、消息队列
+source: official
+icon: icon.svg
+versions:
+  - "7.4"
+  - "7.2"
+  - "6.2"
+default_version: "7.4"
+service_type: database
+db_type: redis
+has_web_ui: false
+health_check_timeout: 30
+
+params:
+  - key: port
+    label: 端口
+    type: number
+    default: 6379
+    required: true
+  - key: password
+    label: 访问密码（留空则不设密码）
+    type: password
+    default: ""
+    required: false
+
+compose_vars:
+  - placeholder: "{{redis_auth_cmd}}"
+    source: param
+    template: " --requirepass {{password}}"
+    empty_value: ""
+
+manage:
+  - key: maxmemory
+    label: 最大内存限制
+    type: select
+    description: Redis 使用的最大内存，超出后按淘汰策略处理，0 表示不限制
+    options:
+      - value: "0"
+        label: 不限制
+      - value: 128mb
+        label: 128MB
+      - value: 256mb
+        label: 256MB
+      - value: 512mb
+        label: 512MB
+      - value: 1gb
+        label: 1GB
+      - value: 2gb
+        label: 2GB
+    restart_required: false
+    file_path: /www/server/redis/redis.conf
+    ini_section: memory
+
+  - key: maxmemory-policy
+    label: 内存淘汰策略
+    type: select
+    description: 内存达到上限时的处理策略
+    options:
+      - value: noeviction
+        label: noeviction（不淘汰，写入报错）
+      - value: allkeys-lru
+        label: allkeys-lru（淘汰最久未使用，推荐缓存场景）
+      - value: volatile-lru
+        label: volatile-lru（淘汰有过期时间的最久未使用）
+      - value: allkeys-lfu
+        label: allkeys-lfu（淘汰最少使用频率）
+      - value: volatile-lfu
+        label: volatile-lfu（淘汰有过期时间的最少使用）
+      - value: allkeys-random
+        label: allkeys-random（随机淘汰）
+      - value: volatile-ttl
+        label: volatile-ttl（淘汰即将过期的）
+    restart_required: false
+    file_path: /www/server/redis/redis.conf
+    ini_section: memory
+
+  - key: appendonly
+    label: AOF 持久化
+    type: switch
+    description: 开启后每次写操作都记录到 AOF 文件，数据更安全但性能略低
+    restart_required: false
+    file_path: /www/server/redis/redis.conf
+    ini_section: persistence
+
+  - key: appendfsync
+    label: AOF 刷盘策略
+    type: select
+    description: AOF 开启时生效
+    options:
+      - value: everysec
+        label: everysec（每秒刷盘，推荐）
+      - value: always
+        label: always（每次写入刷盘，最安全）
+      - value: "no"
+        label: no（由 OS 决定，最快）
+    restart_required: false
+    file_path: /www/server/redis/redis.conf
+    ini_section: persistence
+
+  - key: save
+    label: RDB 快照策略
+    type: text
+    description: "格式：秒数 变更次数，多个用空格分隔，如 '3600 1 300 100 60 10000'，留空禁用"
+    restart_required: false
+    file_path: /www/server/redis/redis.conf
+    ini_section: persistence
+
+  - key: maxclients
+    label: 最大客户端连接数
+    type: number
+    description: 允许同时连接的最大客户端数量
+    restart_required: false
+    file_path: /www/server/redis/redis.conf
+    ini_section: network
+
+  - key: tcp-keepalive
+    label: TCP Keepalive（秒）
+    type: number
+    description: 检测空闲连接的间隔，0 禁用，推荐 300
+    restart_required: false
+    file_path: /www/server/redis/redis.conf
+    ini_section: network
+
+  - key: slowlog-log-slower-than
+    label: 慢日志阈值（微秒）
+    type: number
+    description: 超过此时间的命令记录到慢日志，-1 禁用，0 记录所有，推荐 10000（10ms）
+    restart_required: false
+    file_path: /www/server/redis/redis.conf
+    ini_section: slowlog
+
+  - key: slowlog-max-len
+    label: 慢日志最大条数
+    type: number
+    description: 慢日志队列长度，超出后丢弃最旧的记录
+    restart_required: false
+    file_path: /www/server/redis/redis.conf
+    ini_section: slowlog
+
+actions:
+  - id: bgsave
+    label: 立即保存快照
+    icon: save
+    confirm: false
+    danger: false
+    exec: "redis-cli -a $REDIS_PASSWORD BGSAVE 2>/dev/null || redis-cli BGSAVE"
+
+  - id: bgrewriteaof
+    label: 重写 AOF 文件
+    icon: refresh
+    confirm: false
+    danger: false
+    exec: "redis-cli -a $REDIS_PASSWORD BGREWRITEAOF 2>/dev/null || redis-cli BGREWRITEAOF"
+
+  - id: info
+    label: 查看运行信息
+    icon: info
+    confirm: false
+    danger: false
+    exec: "redis-cli -a $REDIS_PASSWORD INFO 2>/dev/null || redis-cli INFO"
+
+  - id: slowlog
+    label: 查看慢日志
+    icon: clock
+    confirm: false
+    danger: false
+    exec: "redis-cli -a $REDIS_PASSWORD SLOWLOG GET 10 2>/dev/null || redis-cli SLOWLOG GET 10"
+
+  - id: flushdb
+    label: 清空当前数据库
+    icon: trash
+    confirm: true
+    danger: true
+    exec: "redis-cli -a $REDIS_PASSWORD FLUSHDB ASYNC 2>/dev/null || redis-cli FLUSHDB ASYNC"
+
+init_files:
+  - path: /www/server/redis/redis.conf
+    file: init/redis.conf
+
+install_hints:
+  - "数据库管理 → 可以管理 Redis 键值数据"
+  - "应用配置 → 作为缓存、会话存储使用"
+
+install_guide:
+  description: "已自动注册为默认 Redis 服务，现在可以在以下模块中使用："
+  features:
+    - "数据库管理 - 管理 Redis 键值数据"
+    - "应用缓存 - 作为 PHP/应用的缓存后端"
+    - "会话存储 - 存储用户会话数据"
+  primary_action:
+    label: "前往数据库管理"
+    route: "/database"

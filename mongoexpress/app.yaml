@@ -1,0 +1,95 @@
+key: mongoexpress
+name: Mongo Express
+category: tools
+description: MongoDB 的轻量级 Web 管理界面，支持数据库浏览、文档编辑、集合管理
+source: official
+icon: icon.svg
+versions:
+  - "1.0"
+  - "0.54"
+default_version: "1.0"
+has_web_ui: true
+health_check_timeout: 30
+dependencies:
+  - mongodb
+
+params:
+  - key: port
+    label: 访问端口
+    type: number
+    default: 8081
+    required: true
+  - key: admin_username
+    label: Web 界面用户名
+    type: text
+    default: admin
+    required: true
+  - key: admin_password
+    label: Web 界面密码
+    type: password
+    default: ""
+    required: true
+    auto_generate: true
+
+compose_vars:
+  - placeholder: "{{me_mongodb_url}}"
+    source: registry_password
+    registry_type: mongodb
+    template: "mongodb://{{username}}:{{password}}@panel_mongodb:27017/?authSource=admin"
+    empty_value: "mongodb://panel_mongodb:27017"
+
+manage:
+  - key: ME_CONFIG_OPTIONS_EDITORTHEME
+    label: 编辑器主题
+    type: select
+    description: 文档编辑器的代码高亮主题
+    options:
+      - value: default
+        label: 默认
+      - value: ambiance
+        label: Ambiance（暗色）
+      - value: chaos
+        label: Chaos
+      - value: monokai
+        label: Monokai（推荐暗色）
+    restart_required: true
+    file_path: /www/server/mongoexpress/.env
+    ini_section: env
+
+  - key: ME_CONFIG_MONGODB_ENABLE_ADMIN
+    label: 启用管理员模式
+    type: switch
+    description: 开启后可以管理所有数据库，关闭则只能管理指定数据库
+    restart_required: true
+    file_path: /www/server/mongoexpress/.env
+    ini_section: env
+
+  - key: ME_CONFIG_SITE_SESSIONSECRET
+    label: Session 密钥
+    type: password
+    description: 用于加密会话的随机字符串
+    restart_required: true
+    file_path: /www/server/mongoexpress/.env
+    ini_section: env
+
+actions:
+  - id: restart
+    label: 重启服务
+    icon: refresh
+    confirm: false
+    danger: false
+    exec: "echo '请在面板顶部点击重启按钮'"
+
+install_hints:
+  - "通过浏览器访问 http://服务器IP:端口 进入管理界面"
+  - "使用安装时设置的用户名密码登录"
+
+install_guide:
+  description: "Mongo Express 已安装，可以通过浏览器管理 MongoDB："
+  features:
+    - "数据库浏览 - 查看所有数据库和集合"
+    - "文档编辑 - 增删改查 MongoDB 文档"
+    - "集合管理 - 创建索引、查看统计"
+  primary_action:
+    label: "打开 Mongo Express"
+    route: "/apps"

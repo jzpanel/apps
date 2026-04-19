@@ -1,0 +1,133 @@
+key: mongodb
+name: MongoDB
+category: database
+description: 面向文档的 NoSQL 数据库，灵活的 JSON 数据模型，适合快速迭代和大数据场景
+source: official
+icon: icon.svg
+versions:
+  - "7.0"
+  - "6.0"
+  - "5.0"
+default_version: "7.0"
+service_type: database
+db_type: mongodb
+has_web_ui: false
+health_check_timeout: 60
+
+params:
+  - key: port
+    label: 端口
+    type: number
+    default: 27017
+    required: true
+  - key: root_password
+    label: Root 密码
+    type: password
+    default: ""
+    required: true
+    auto_generate: true
+
+manage:
+  - key: net.maxIncomingConnections
+    label: 最大连接数
+    type: number
+    description: 允许的最大客户端连接数
+    restart_required: true
+    file_path: /www/server/mongodb/mongod.conf
+    ini_section: net
+
+  - key: storage.wiredTiger.engineConfig.cacheSizeGB
+    label: WiredTiger 缓存大小（GB）
+    type: select
+    description: 建议设为可用内存的 50%，默认为系统内存的 50% 或 256MB 取较大值
+    options:
+      - value: "0.25"
+        label: 0.25GB（512MB 内存）
+      - value: "0.5"
+        label: 0.5GB（1GB 内存）
+      - value: "1"
+        label: 1GB（2GB 内存）
+      - value: "2"
+        label: 2GB（4GB 内存）
+      - value: "4"
+        label: 4GB（8GB 内存）
+    restart_required: true
+    file_path: /www/server/mongodb/mongod.conf
+    ini_section: storage
+
+  - key: operationProfiling.slowOpThresholdMs
+    label: 慢操作阈值（毫秒）
+    type: number
+    description: 超过此时间的操作记录到 profiler，-1 禁用，0 记录所有
+    restart_required: false
+    file_path: /www/server/mongodb/mongod.conf
+    ini_section: operationProfiling
+
+  - key: operationProfiling.mode
+    label: 性能分析模式
+    type: select
+    description: off=关闭，slowOp=仅慢操作，all=所有操作
+    options:
+      - value: "off"
+        label: off（关闭）
+      - value: slowOp
+        label: slowOp（仅慢操作，推荐）
+      - value: all
+        label: all（所有操作，影响性能）
+    restart_required: false
+    file_path: /www/server/mongodb/mongod.conf
+    ini_section: operationProfiling
+
+  - key: systemLog.verbosity
+    label: 日志详细程度
+    type: select
+    description: 0=默认，1-5 逐渐增加详细程度
+    options:
+      - value: "0"
+        label: "0（默认）"
+      - value: "1"
+        label: "1（详细）"
+      - value: "2"
+        label: "2（调试）"
+    restart_required: false
+    file_path: /www/server/mongodb/mongod.conf
+    ini_section: systemLog
+
+actions:
+  - id: compact
+    label: 压缩数据库
+    icon: compress
+    confirm: true
+    danger: false
+    exec: "mongosh --username root --password $MONGO_INITDB_ROOT_PASSWORD --eval 'db.adminCommand({listDatabases:1}).databases.forEach(d => { if(d.name !== \"admin\" && d.name !== \"local\" && d.name !== \"config\") { db.getSiblingDB(d.name).runCommand({compact: db.getSiblingDB(d.name).getCollectionNames()[0]}) } })' 2>&1 | head -20"
+
+  - id: server_status
+    label: 查看服务状态
+    icon: info
+    confirm: false
+    danger: false
+    exec: "mongosh --username root --password $MONGO_INITDB_ROOT_PASSWORD --eval 'db.adminCommand({serverStatus:1})' --quiet 2>&1 | head -50"
+
+  - id: current_ops
+    label: 查看当前操作
+    icon: list
+    confirm: false
+    danger: false
+    exec: "mongosh --username root --password $MONGO_INITDB_ROOT_PASSWORD --eval 'db.adminCommand({currentOp:1, active:true})' --quiet 2>&1 | head -30"
+
+init_files:
+  - path: /www/server/mongodb/mongod.conf
+    file: init/mongod.conf
+
+install_hints:
+  - "数据库管理 → 可以管理 MongoDB 数据库和集合"
+  - "计划任务 → 可以设置数据库自动备份"
+
+install_guide:
+  description: "已自动注册为默认 MongoDB 服务，现在可以在以下模块中使用："
+  features:
+    - "数据库管理 - 管理 MongoDB 数据库和集合"
+    - "计划任务 - 设置数据库自动备份"
+  primary_action:
+    label: "前往数据库管理"
+    route: "/database"
