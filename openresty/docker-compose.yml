@@ -10,6 +10,7 @@ services:
       - /www/wwwroot:/www/wwwroot
       - /www/server/openresty/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf:ro
       - /www/server/openresty/conf.d:/etc/nginx/conf.d
+      - /www/server/openresty/conf/vhost:/etc/nginx/conf/vhost
       - /www/logs/openresty:/usr/local/openresty/nginx/logs
       - /www/server/openresty/ssl:/etc/nginx/ssl
       - /www/server/openresty/lua:/usr/local/openresty/lualib/custom
