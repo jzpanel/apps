@@ -3,21 +3,13 @@ services:
     image: openresty/openresty:{{version}}-alpine
     container_name: panel_openresty
     restart: unless-stopped
-    ports:
-      - "{{http_port}}:80"
-      - "{{https_port}}:443"
+    network_mode: host
     volumes:
       - /www/wwwroot:/www/wwwroot
       - /www/server/openresty/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf:ro
       - /www/server/openresty/conf.d:/etc/nginx/conf.d
       - /www/server/openresty/conf/vhost:/etc/nginx/conf/vhost
       - /www/logs/openresty:/usr/local/openresty/nginx/logs
+      - /www/wwwlogs:/www/wwwlogs
       - /www/server/openresty/ssl:/etc/nginx/ssl
       - /www/server/openresty/lua:/usr/local/openresty/lualib/custom
-    networks:
-      - panel_network
-
-networks:
-  panel_network:
-    external: true
-    name: panel_network
