@@ -1,11 +1,11 @@
 ﻿key: php_80
 name: PHP 8.0
 category: runtime
-description: PHP 8.0 FPM 杩愯鐜锛屾敮鎸佹渶鏂扮壒鎬э紝閰嶅悎 Nginx/Apache 杩愯 PHP 缃戠珯
+description: PHP 8.0 FPM 运行环境，配合 Nginx/Apache 运行 PHP 网站
 source: official
 icon: icon.svg
 versions:
-  - "8.3"
+  - "8.0"
 default_version: "8.0"
 service_type: php
 has_web_ui: false
@@ -13,35 +13,35 @@ health_check_timeout: 30
 
 params:
   - key: fpm_port
-    label: FPM 鐩戝惉绔彛
+    label: FPM 监听端口
     type: number
     default: 9080
     required: true
 
 manage:
   - key: memory_limit
-    label: 鍐呭瓨闄愬埗
+    label: 内存限制
     type: select
-    description: 姣忎釜 PHP 杩涚▼鍙娇鐢ㄧ殑鏈€澶у唴瀛?
+    description: 每个 PHP 进程可使用的最大内存
     options:
       - value: 64M
         label: 64M
       - value: 128M
-        label: 128M锛堥粯璁わ級
+        label: 128M（默认）
       - value: 256M
-        label: 256M锛堟帹鑽愶級
+        label: 256M（推荐）
       - value: 512M
         label: 512M
       - value: 1024M
         label: 1024M
       - value: -1
-        label: 涓嶉檺鍒?
+        label: 不限制
     restart_required: true
     file_path: /www/server/php_80/php.ini
     ini_section: PHP
 
   - key: upload_max_filesize
-    label: 鏈€澶т笂浼犳枃浠跺ぇ灏?
+    label: 最大上传文件大小
     type: select
     options:
       - value: 2M
@@ -51,7 +51,7 @@ manage:
       - value: 32M
         label: 32M
       - value: 64M
-        label: 64M锛堟帹鑽愶級
+        label: 64M（推荐）
       - value: 128M
         label: 128M
       - value: 256M
@@ -61,7 +61,7 @@ manage:
     ini_section: PHP
 
   - key: post_max_size
-    label: POST 鏁版嵁鏈€澶уぇ灏?
+    label: POST 数据最大大小
     type: select
     options:
       - value: 8M
@@ -71,7 +71,7 @@ manage:
       - value: 64M
         label: 64M
       - value: 128M
-        label: 128M锛堟帹鑽愶級
+        label: 128M（推荐）
       - value: 256M
         label: 256M
     restart_required: true
@@ -79,26 +79,26 @@ manage:
     ini_section: PHP
 
   - key: max_execution_time
-    label: 鏈€澶ф墽琛屾椂闂达紙绉掞級
+    label: 最大执行时间（秒）
     type: number
-    description: PHP 鑴氭湰鏈€澶ф墽琛屾椂闂达紝0 琛ㄧず涓嶉檺鍒?
+    description: PHP 脚本最大执行时间，0 表示不限制
     restart_required: true
     file_path: /www/server/php_80/php.ini
     ini_section: PHP
 
   - key: max_input_vars
-    label: 鏈€澶ц緭鍏ュ彉閲忔暟
+    label: 最大输入变量数
     type: number
     restart_required: true
     file_path: /www/server/php_80/php.ini
     ini_section: PHP
 
   - key: date.timezone
-    label: 鏃跺尯
+    label: 时区
     type: select
     options:
       - value: Asia/Shanghai
-        label: Asia/Shanghai锛堟帹鑽愶級
+        label: Asia/Shanghai（推荐）
       - value: Asia/Hong_Kong
         label: Asia/Hong_Kong
       - value: UTC
@@ -108,37 +108,37 @@ manage:
     ini_section: PHP
 
   - key: display_errors
-    label: 鏄剧ず閿欒淇℃伅
+    label: 显示错误信息
     type: switch
-    description: 鐢熶骇鐜寤鸿鍏抽棴
+    description: 生产环境建议关闭
     restart_required: true
     file_path: /www/server/php_80/php.ini
     ini_section: PHP
 
   - key: disable_functions
-    label: 绂佺敤鍑芥暟
+    label: 禁用函数
     type: text
-    description: "閫楀彿鍒嗛殧锛屽: exec,passthru,shell_exec锛岀暀绌轰笉绂佺敤"
+    description: "逗号分隔，如: exec,passthru,shell_exec，留空不禁用"
     restart_required: true
     file_path: /www/server/php_80/php.ini
     ini_section: PHP
 
   - key: opcache.enable
-    label: 鍚敤 OPcache
+    label: 启用 OPcache
     type: switch
-    description: 瀛楄妭鐮佺紦瀛橈紝寮虹儓鎺ㄨ崘寮€鍚?
+    description: 字节码缓存，强烈推荐开启
     restart_required: true
     file_path: /www/server/php_80/php.ini
     ini_section: opcache
 
   - key: opcache.memory_consumption
-    label: OPcache 鍐呭瓨澶у皬锛圡B锛?
+    label: OPcache 内存大小（MB）
     type: select
     options:
       - value: "64"
         label: 64MB
       - value: "128"
-        label: 128MB锛堟帹鑽愶級
+        label: 128MB（推荐）
       - value: "256"
         label: 256MB
     restart_required: true
@@ -146,45 +146,45 @@ manage:
     ini_section: opcache
 
   - key: pm
-    label: 杩涚▼绠＄悊鏂瑰紡
+    label: 进程管理方式
     type: select
     options:
       - value: dynamic
-        label: dynamic锛堝姩鎬侊紝鎺ㄨ崘锛?
+        label: dynamic（动态，推荐）
       - value: static
-        label: static锛堝浐瀹氾級
+        label: static（固定）
       - value: ondemand
-        label: ondemand锛堟寜闇€锛?
+        label: ondemand（按需）
     restart_required: true
     file_path: /www/server/php_80/php-fpm.conf
     ini_section: www
 
   - key: pm.max_children
-    label: 鏈€澶у瓙杩涚▼鏁?
+    label: 最大子进程数
     type: number
-    description: 鏍规嵁鍐呭瓨璋冩暣锛屾瘡杩涚▼绾?30-50MB
+    description: 根据内存调整，每进程约 30-50MB
     restart_required: true
     file_path: /www/server/php_80/php-fpm.conf
     ini_section: www
 
   - key: pm.max_requests
-    label: 姣忚繘绋嬫渶澶ц姹傛暟
+    label: 每进程最大请求数
     type: number
-    description: 闃叉鍐呭瓨娉勬紡锛?=涓嶉檺鍒?
+    description: 防止内存泄漏，0=不限制
     restart_required: true
     file_path: /www/server/php_80/php-fpm.conf
     ini_section: www
 
 actions:
   - id: reload
-    label: 閲嶈浇閰嶇疆
+    label: 重载配置
     icon: refresh
     confirm: false
     danger: false
     exec: "kill -USR2 1"
 
   - id: phpinfo
-    label: 鏌ョ湅 PHP 淇℃伅
+    label: 查看 PHP 信息
     icon: info
     confirm: false
     danger: false
@@ -210,19 +210,19 @@ php_extensions:
     label: MongoDB
     install_command: "pecl install mongodb && docker-php-ext-enable mongodb"
   - name: gd
-    label: GD 鍥惧儚澶勭悊
+    label: GD 图像处理
     install_command: "apt-get update -qq && apt-get install -y -qq libfreetype6-dev libjpeg62-turbo-dev libpng-dev libwebp-dev && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp && docker-php-ext-install gd"
   - name: imagick
     label: ImageMagick
     install_command: "apt-get update -qq && apt-get install -y -qq libmagickwand-dev && pecl install imagick && docker-php-ext-enable imagick"
   - name: exif
-    label: EXIF 鍥剧墖鍏冩暟鎹?
+    label: EXIF 图片元数据
     install_command: "docker-php-ext-install exif && docker-php-ext-enable exif"
   - name: mbstring
-    label: 澶氬瓧鑺傚瓧绗︿覆
+    label: 多字节字符串
     install_command: "docker-php-ext-install mbstring"
   - name: intl
-    label: 鍥介檯鍖栵紙intl锛?
+    label: 国际化（intl）
     install_command: "apt-get update -qq && apt-get install -y -qq libicu-dev && docker-php-ext-install intl"
   - name: curl
     label: cURL
@@ -234,34 +234,34 @@ php_extensions:
     label: Sockets
     install_command: "docker-php-ext-install sockets"
   - name: zip
-    label: ZIP 鍘嬬缉
+    label: ZIP 压缩
     install_command: "apt-get update -qq && apt-get install -y -qq libzip-dev && docker-php-ext-install zip"
   - name: fileinfo
-    label: 鏂囦欢淇℃伅妫€娴?
+    label: 文件信息检测
     install_command: "docker-php-ext-install fileinfo"
   - name: sodium
-    label: Sodium 鍔犲瘑
+    label: Sodium 加密
     install_command: "docker-php-ext-install sodium"
   - name: opcache
     label: OPcache
     install_command: "docker-php-ext-install opcache && docker-php-ext-enable opcache"
   - name: apcu
-    label: APCu 鐢ㄦ埛鎬佺紦瀛?
+    label: APCu 用户态缓存
     install_command: "pecl install apcu && docker-php-ext-enable apcu"
   - name: ioncube
-    label: ionCube Loader锛堣繍琛屽姞瀵嗘簮鐮侊級
+    label: ionCube Loader（运行加密源码）
     install_command: "PHP_VER=$(php -r 'echo PHP_MAJOR_VERSION.\".\".PHP_MINOR_VERSION;') && curl -fsSL https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz -o /tmp/ioncube.tar.gz && tar -xzf /tmp/ioncube.tar.gz -C /tmp && cp /tmp/ioncube/ioncube_loader_lin_${PHP_VER}.so $(php-config --extension-dir)/ && echo \"zend_extension=ioncube_loader_lin_${PHP_VER}.so\" > /usr/local/etc/php/conf.d/00-ioncube.ini && rm -rf /tmp/ioncube /tmp/ioncube.tar.gz"
   - name: swoole
-    label: Swoole 鍗忕▼妗嗘灦
+    label: Swoole 协程框架
     install_command: "pecl install swoole && docker-php-ext-enable swoole"
   - name: xdebug
-    label: Xdebug 璋冭瘯鍣?
+    label: Xdebug 调试器
     install_command: "pecl install xdebug && docker-php-ext-enable xdebug"
   - name: bcmath
-    label: BCMath 楂樼簿搴︽暟瀛?
+    label: BCMath 高精度数学
     install_command: "docker-php-ext-install bcmath"
   - name: pcntl
-    label: 杩涚▼鎺у埗
+    label: 进程控制
     install_command: "docker-php-ext-install pcntl"
 
 init_files:
@@ -271,5 +271,5 @@ init_files:
     file: init/php-fpm.conf
 
 install_hints:
-  - "PHP 8.3 宸插畨瑁咃紝鍙湪缃戠珯绠＄悊涓€夋嫨姝ょ増鏈?
-  - "鍦ㄦ墿灞曠鐞嗕腑瀹夎鎵€闇€鎵╁睍锛坢ysqli銆乺edis 绛夛級"
+  - "PHP 8.0 已安装，可在网站管理中选择此版本"
+  - "在扩展管理中安装所需扩展（mysqli、redis 等）"
