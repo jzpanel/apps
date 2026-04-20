@@ -1,0 +1,275 @@
+﻿key: php_81
+name: PHP 8.1
+category: runtime
+description: PHP 8.1 FPM 杩愯鐜锛屾敮鎸佹渶鏂扮壒鎬э紝閰嶅悎 Nginx/Apache 杩愯 PHP 缃戠珯
+source: official
+icon: icon.svg
+versions:
+  - "8.3"
+default_version: "8.1"
+service_type: php
+has_web_ui: false
+health_check_timeout: 30
+
+params:
+  - key: fpm_port
+    label: FPM 鐩戝惉绔彛
+    type: number
+    default: 9081
+    required: true
+
+manage:
+  - key: memory_limit
+    label: 鍐呭瓨闄愬埗
+    type: select
+    description: 姣忎釜 PHP 杩涚▼鍙娇鐢ㄧ殑鏈€澶у唴瀛?
+    options:
+      - value: 64M
+        label: 64M
+      - value: 128M
+        label: 128M锛堥粯璁わ級
+      - value: 256M
+        label: 256M锛堟帹鑽愶級
+      - value: 512M
+        label: 512M
+      - value: 1024M
+        label: 1024M
+      - value: -1
+        label: 涓嶉檺鍒?
+    restart_required: true
+    file_path: /www/server/php_81/php.ini
+    ini_section: PHP
+
+  - key: upload_max_filesize
+    label: 鏈€澶т笂浼犳枃浠跺ぇ灏?
+    type: select
+    options:
+      - value: 2M
+        label: 2M
+      - value: 10M
+        label: 10M
+      - value: 32M
+        label: 32M
+      - value: 64M
+        label: 64M锛堟帹鑽愶級
+      - value: 128M
+        label: 128M
+      - value: 256M
+        label: 256M
+    restart_required: true
+    file_path: /www/server/php_81/php.ini
+    ini_section: PHP
+
+  - key: post_max_size
+    label: POST 鏁版嵁鏈€澶уぇ灏?
+    type: select
+    options:
+      - value: 8M
+        label: 8M
+      - value: 32M
+        label: 32M
+      - value: 64M
+        label: 64M
+      - value: 128M
+        label: 128M锛堟帹鑽愶級
+      - value: 256M
+        label: 256M
+    restart_required: true
+    file_path: /www/server/php_81/php.ini
+    ini_section: PHP
+
+  - key: max_execution_time
+    label: 鏈€澶ф墽琛屾椂闂达紙绉掞級
+    type: number
+    description: PHP 鑴氭湰鏈€澶ф墽琛屾椂闂达紝0 琛ㄧず涓嶉檺鍒?
+    restart_required: true
+    file_path: /www/server/php_81/php.ini
+    ini_section: PHP
+
+  - key: max_input_vars
+    label: 鏈€澶ц緭鍏ュ彉閲忔暟
+    type: number
+    restart_required: true
+    file_path: /www/server/php_81/php.ini
+    ini_section: PHP
+
+  - key: date.timezone
+    label: 鏃跺尯
+    type: select
+    options:
+      - value: Asia/Shanghai
+        label: Asia/Shanghai锛堟帹鑽愶級
+      - value: Asia/Hong_Kong
+        label: Asia/Hong_Kong
+      - value: UTC
+        label: UTC
+    restart_required: true
+    file_path: /www/server/php_81/php.ini
+    ini_section: PHP
+
+  - key: display_errors
+    label: 鏄剧ず閿欒淇℃伅
+    type: switch
+    description: 鐢熶骇鐜寤鸿鍏抽棴
+    restart_required: true
+    file_path: /www/server/php_81/php.ini
+    ini_section: PHP
+
+  - key: disable_functions
+    label: 绂佺敤鍑芥暟
+    type: text
+    description: "閫楀彿鍒嗛殧锛屽: exec,passthru,shell_exec锛岀暀绌轰笉绂佺敤"
+    restart_required: true
+    file_path: /www/server/php_81/php.ini
+    ini_section: PHP
+
+  - key: opcache.enable
+    label: 鍚敤 OPcache
+    type: switch
+    description: 瀛楄妭鐮佺紦瀛橈紝寮虹儓鎺ㄨ崘寮€鍚?
+    restart_required: true
+    file_path: /www/server/php_81/php.ini
+    ini_section: opcache
+
+  - key: opcache.memory_consumption
+    label: OPcache 鍐呭瓨澶у皬锛圡B锛?
+    type: select
+    options:
+      - value: "64"
+        label: 64MB
+      - value: "128"
+        label: 128MB锛堟帹鑽愶級
+      - value: "256"
+        label: 256MB
+    restart_required: true
+    file_path: /www/server/php_81/php.ini
+    ini_section: opcache
+
+  - key: pm
+    label: 杩涚▼绠＄悊鏂瑰紡
+    type: select
+    options:
+      - value: dynamic
+        label: dynamic锛堝姩鎬侊紝鎺ㄨ崘锛?
+      - value: static
+        label: static锛堝浐瀹氾級
+      - value: ondemand
+        label: ondemand锛堟寜闇€锛?
+    restart_required: true
+    file_path: /www/server/php_81/php-fpm.conf
+    ini_section: www
+
+  - key: pm.max_children
+    label: 鏈€澶у瓙杩涚▼鏁?
+    type: number
+    description: 鏍规嵁鍐呭瓨璋冩暣锛屾瘡杩涚▼绾?30-50MB
+    restart_required: true
+    file_path: /www/server/php_81/php-fpm.conf
+    ini_section: www
+
+  - key: pm.max_requests
+    label: 姣忚繘绋嬫渶澶ц姹傛暟
+    type: number
+    description: 闃叉鍐呭瓨娉勬紡锛?=涓嶉檺鍒?
+    restart_required: true
+    file_path: /www/server/php_81/php-fpm.conf
+    ini_section: www
+
+actions:
+  - id: reload
+    label: 閲嶈浇閰嶇疆
+    icon: refresh
+    confirm: false
+    danger: false
+    exec: "kill -USR2 1"
+
+  - id: phpinfo
+    label: 鏌ョ湅 PHP 淇℃伅
+    icon: info
+    confirm: false
+    danger: false
+    exec: "php -i | head -50"
+
+php_extensions:
+  - name: mysqli
+    label: MySQLi
+    install_command: "docker-php-ext-install mysqli && docker-php-ext-enable mysqli"
+  - name: pdo_mysql
+    label: PDO MySQL
+    install_command: "docker-php-ext-install pdo_mysql && docker-php-ext-enable pdo_mysql"
+  - name: pdo_pgsql
+    label: PDO PostgreSQL
+    install_command: "apt-get update -qq && apt-get install -y -qq libpq-dev && docker-php-ext-install pdo_pgsql"
+  - name: redis
+    label: Redis
+    install_command: "pecl install redis && docker-php-ext-enable redis"
+  - name: memcached
+    label: Memcached
+    install_command: "apt-get update -qq && apt-get install -y -qq libmemcached-dev && pecl install memcached && docker-php-ext-enable memcached"
+  - name: mongodb
+    label: MongoDB
+    install_command: "pecl install mongodb && docker-php-ext-enable mongodb"
+  - name: gd
+    label: GD 鍥惧儚澶勭悊
+    install_command: "apt-get update -qq && apt-get install -y -qq libfreetype6-dev libjpeg62-turbo-dev libpng-dev libwebp-dev && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp && docker-php-ext-install gd"
+  - name: imagick
+    label: ImageMagick
+    install_command: "apt-get update -qq && apt-get install -y -qq libmagickwand-dev && pecl install imagick && docker-php-ext-enable imagick"
+  - name: exif
+    label: EXIF 鍥剧墖鍏冩暟鎹?
+    install_command: "docker-php-ext-install exif && docker-php-ext-enable exif"
+  - name: mbstring
+    label: 澶氬瓧鑺傚瓧绗︿覆
+    install_command: "docker-php-ext-install mbstring"
+  - name: intl
+    label: 鍥介檯鍖栵紙intl锛?
+    install_command: "apt-get update -qq && apt-get install -y -qq libicu-dev && docker-php-ext-install intl"
+  - name: curl
+    label: cURL
+    install_command: "apt-get update -qq && apt-get install -y -qq libcurl4-openssl-dev && docker-php-ext-install curl"
+  - name: soap
+    label: SOAP
+    install_command: "apt-get update -qq && apt-get install -y -qq libxml2-dev && docker-php-ext-install soap"
+  - name: sockets
+    label: Sockets
+    install_command: "docker-php-ext-install sockets"
+  - name: zip
+    label: ZIP 鍘嬬缉
+    install_command: "apt-get update -qq && apt-get install -y -qq libzip-dev && docker-php-ext-install zip"
+  - name: fileinfo
+    label: 鏂囦欢淇℃伅妫€娴?
+    install_command: "docker-php-ext-install fileinfo"
+  - name: sodium
+    label: Sodium 鍔犲瘑
+    install_command: "docker-php-ext-install sodium"
+  - name: opcache
+    label: OPcache
+    install_command: "docker-php-ext-install opcache && docker-php-ext-enable opcache"
+  - name: apcu
+    label: APCu 鐢ㄦ埛鎬佺紦瀛?
+    install_command: "pecl install apcu && docker-php-ext-enable apcu"
+  - name: ioncube
+    label: ionCube Loader锛堣繍琛屽姞瀵嗘簮鐮侊級
+    install_command: "PHP_VER=$(php -r 'echo PHP_MAJOR_VERSION.\".\".PHP_MINOR_VERSION;') && curl -fsSL https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz -o /tmp/ioncube.tar.gz && tar -xzf /tmp/ioncube.tar.gz -C /tmp && cp /tmp/ioncube/ioncube_loader_lin_${PHP_VER}.so $(php-config --extension-dir)/ && echo \"zend_extension=ioncube_loader_lin_${PHP_VER}.so\" > /usr/local/etc/php/conf.d/00-ioncube.ini && rm -rf /tmp/ioncube /tmp/ioncube.tar.gz"
+  - name: swoole
+    label: Swoole 鍗忕▼妗嗘灦
+    install_command: "pecl install swoole && docker-php-ext-enable swoole"
+  - name: xdebug
+    label: Xdebug 璋冭瘯鍣?
+    install_command: "pecl install xdebug && docker-php-ext-enable xdebug"
+  - name: bcmath
+    label: BCMath 楂樼簿搴︽暟瀛?
+    install_command: "docker-php-ext-install bcmath"
+  - name: pcntl
+    label: 杩涚▼鎺у埗
+    install_command: "docker-php-ext-install pcntl"
+
+init_files:
+  - path: /www/server/php_81/php.ini
+    file: init/php.ini
+  - path: /www/server/php_81/php-fpm.conf
+    file: init/php-fpm.conf
+
+install_hints:
+  - "PHP 8.3 宸插畨瑁咃紝鍙湪缃戠珯绠＄悊涓€夋嫨姝ょ増鏈?
+  - "鍦ㄦ墿灞曠鐞嗕腑瀹夎鎵€闇€鎵╁睍锛坢ysqli銆乺edis 绛夛級"
