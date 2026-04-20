@@ -1,0 +1,470 @@
+key: php
+name: PHP
+category: runtime
+description: 高性能 PHP-FPM 运行环境，支持多版本共存，配合 Nginx/Apache 运行 PHP 网站
+source: official
+icon: icon.svg
+versions:
+  - "8.3"
+  - "8.2"
+  - "8.1"
+  - "8.0"
+  - "7.4"
+default_version: "8.2"
+service_type: php
+has_web_ui: false
+health_check_timeout: 30
+version_key_template: "php_{{version_nodot}}"
+
+params:
+  - key: fpm_port
+    label: FPM 监听端口
+    type: number
+    default: 9000
+    required: true
+
+manage:
+  # ── php.ini 参数 ──────────────────────────────────────────────
+  - key: memory_limit
+    label: 内存限制
+    type: select
+    description: 每个 PHP 进程可使用的最大内存
+    options:
+      - value: 64M
+        label: 64M（低配服务器）
+      - value: 128M
+        label: 128M（默认）
+      - value: 256M
+        label: 256M（推荐）
+      - value: 512M
+        label: 512M（大型应用）
+      - value: 1024M
+        label: 1024M（高内存场景）
+      - value: -1
+        label: 不限制
+    restart_required: true
+    file_path: /www/server/{{key}}/php.ini
+    ini_section: PHP
+
+  - key: upload_max_filesize
+    label: 最大上传文件大小
+    type: select
+    description: 单个文件上传大小限制，需小于 post_max_size
+    options:
+      - value: 2M
+        label: 2M（默认）
+      - value: 10M
+        label: 10M
+      - value: 32M
+        label: 32M
+      - value: 64M
+        label: 64M（推荐）
+      - value: 128M
+        label: 128M
+      - value: 256M
+        label: 256M（大文件）
+    restart_required: true
+    file_path: /www/server/{{key}}/php.ini
+    ini_section: PHP
+
+  - key: post_max_size
+    label: POST 数据最大大小
+    type: select
+    description: 应大于 upload_max_filesize
+    options:
+      - value: 8M
+        label: 8M（默认）
+      - value: 32M
+        label: 32M
+      - value: 64M
+        label: 64M
+      - value: 128M
+        label: 128M（推荐）
+      - value: 256M
+        label: 256M
+    restart_required: true
+    file_path: /www/server/{{key}}/php.ini
+    ini_section: PHP
+
+  - key: max_execution_time
+    label: 最大执行时间（秒）
+    type: number
+    description: PHP 脚本最大执行时间，0 表示不限制，导入大文件时需增大
+    restart_required: true
+    file_path: /www/server/{{key}}/php.ini
+    ini_section: PHP
+
+  - key: max_input_time
+    label: 最大输入解析时间（秒）
+    type: number
+    description: 解析 POST/GET 数据的最大时间
+    restart_required: true
+    file_path: /www/server/{{key}}/php.ini
+    ini_section: PHP
+
+  - key: max_input_vars
+    label: 最大输入变量数
+    type: number
+    description: 限制 GET/POST/COOKIE 的变量数量，防止哈希碰撞攻击
+    restart_required: true
+    file_path: /www/server/{{key}}/php.ini
+    ini_section: PHP
+
+  - key: date.timezone
+    label: 时区
+    type: select
+    description: PHP 默认时区
+    options:
+      - value: Asia/Shanghai
+        label: Asia/Shanghai（中国标准时间）
+      - value: Asia/Hong_Kong
+        label: Asia/Hong_Kong
+      - value: Asia/Tokyo
+        label: Asia/Tokyo
+      - value: UTC
+        label: UTC
+      - value: America/New_York
+        label: America/New_York
+      - value: Europe/London
+        label: Europe/London
+    restart_required: true
+    file_path: /www/server/{{key}}/php.ini
+    ini_section: PHP
+
+  - key: display_errors
+    label: 显示错误信息
+    type: switch
+    description: 生产环境建议关闭，开发环境可开启
+    restart_required: true
+    file_path: /www/server/{{key}}/php.ini
+    ini_section: PHP
+
+  - key: error_reporting
+    label: 错误报告级别
+    type: select
+    description: 控制哪些错误会被记录
+    options:
+      - value: "E_ALL & ~E_DEPRECATED & ~E_STRICT"
+        label: 推荐（忽略废弃和严格警告）
+      - value: "E_ALL"
+        label: 全部错误
+      - value: "E_ERROR | E_WARNING | E_PARSE"
+        label: 仅严重错误
+      - value: "0"
+        label: 关闭所有错误报告
+    restart_required: true
+    file_path: /www/server/{{key}}/php.ini
+    ini_section: PHP
+
+  - key: disable_functions
+    label: 禁用函数
+    type: text
+    description: "逗号分隔，如: exec,passthru,shell_exec,system，留空不禁用"
+    restart_required: true
+    file_path: /www/server/{{key}}/php.ini
+    ini_section: PHP
+
+  - key: short_open_tag
+    label: 短标签支持
+    type: switch
+    description: 开启后支持 <?  ?> 短标签，部分老代码需要
+    restart_required: true
+    file_path: /www/server/{{key}}/php.ini
+    ini_section: PHP
+
+  # ── OPcache 配置 ──────────────────────────────────────────────
+  - key: opcache.enable
+    label: 启用 OPcache
+    type: switch
+    description: 字节码缓存，显著提升 PHP 性能，强烈推荐开启
+    restart_required: true
+    file_path: /www/server/{{key}}/php.ini
+    ini_section: opcache
+
+  - key: opcache.memory_consumption
+    label: OPcache 内存大小（MB）
+    type: select
+    description: OPcache 使用的共享内存大小
+    options:
+      - value: "64"
+        label: 64MB
+      - value: "128"
+        label: 128MB（推荐）
+      - value: "256"
+        label: 256MB（大型项目）
+      - value: "512"
+        label: 512MB
+    restart_required: true
+    file_path: /www/server/{{key}}/php.ini
+    ini_section: opcache
+
+  - key: opcache.max_accelerated_files
+    label: OPcache 最大缓存文件数
+    type: select
+    description: 可缓存的最大 PHP 文件数量
+    options:
+      - value: "4000"
+        label: 4000（默认）
+      - value: "10000"
+        label: 10000（推荐）
+      - value: "20000"
+        label: 20000（大型项目）
+    restart_required: true
+    file_path: /www/server/{{key}}/php.ini
+    ini_section: opcache
+
+  - key: opcache.revalidate_freq
+    label: OPcache 重新验证频率（秒）
+    type: select
+    description: 检查文件是否更新的间隔，0=每次请求都检查，生产环境建议 60
+    options:
+      - value: "0"
+        label: 0（开发环境，每次检查）
+      - value: "60"
+        label: 60秒（推荐）
+      - value: "300"
+        label: 300秒（高性能）
+    restart_required: true
+    file_path: /www/server/{{key}}/php.ini
+    ini_section: opcache
+
+  # ── PHP-FPM 配置 ──────────────────────────────────────────────
+  - key: pm
+    label: 进程管理方式
+    type: select
+    description: "static=固定进程数，dynamic=动态调整（推荐），ondemand=按需创建"
+    options:
+      - value: dynamic
+        label: dynamic（动态，推荐）
+      - value: static
+        label: static（固定，高并发）
+      - value: ondemand
+        label: ondemand（按需，低内存）
+    restart_required: true
+    file_path: /www/server/{{key}}/php-fpm.conf
+    ini_section: www
+
+  - key: pm.max_children
+    label: 最大子进程数
+    type: number
+    description: 同时处理请求的最大进程数，根据内存调整（每进程约 30-50MB）
+    restart_required: true
+    file_path: /www/server/{{key}}/php-fpm.conf
+    ini_section: www
+
+  - key: pm.start_servers
+    label: 启动时进程数
+    type: number
+    description: FPM 启动时创建的进程数（dynamic 模式有效）
+    restart_required: true
+    file_path: /www/server/{{key}}/php-fpm.conf
+    ini_section: www
+
+  - key: pm.min_spare_servers
+    label: 最小空闲进程数
+    type: number
+    description: 保持的最小空闲进程数（dynamic 模式有效）
+    restart_required: true
+    file_path: /www/server/{{key}}/php-fpm.conf
+    ini_section: www
+
+  - key: pm.max_spare_servers
+    label: 最大空闲进程数
+    type: number
+    description: 允许的最大空闲进程数（dynamic 模式有效）
+    restart_required: true
+    file_path: /www/server/{{key}}/php-fpm.conf
+    ini_section: www
+
+  - key: pm.max_requests
+    label: 每进程最大请求数
+    type: number
+    description: 每个进程处理多少请求后重启，防止内存泄漏，0=不限制
+    restart_required: true
+    file_path: /www/server/{{key}}/php-fpm.conf
+    ini_section: www
+
+  - key: request_terminate_timeout
+    label: 请求超时时间（秒）
+    type: number
+    description: 单个请求的最大处理时间，超时后强制终止，0=不限制
+    restart_required: true
+    file_path: /www/server/{{key}}/php-fpm.conf
+    ini_section: www
+
+actions:
+  - id: reload
+    label: 重载配置
+    icon: refresh
+    confirm: false
+    danger: false
+    exec: "kill -USR2 1"
+
+  - id: status
+    label: 查看进程状态
+    icon: info
+    confirm: false
+    danger: false
+    exec: "php-fpm -t 2>&1 && echo '配置正常'"
+
+  - id: phpinfo
+    label: 查看 PHP 信息
+    icon: info
+    confirm: false
+    danger: false
+    exec: "php -i | head -100"
+
+php_extensions:
+  # ── 数据库 ────────────────────────────────────────────────────
+  - name: mysqli
+    label: MySQLi
+    install_command: "docker-php-ext-install mysqli && docker-php-ext-enable mysqli"
+
+  - name: pdo_mysql
+    label: PDO MySQL
+    install_command: "docker-php-ext-install pdo_mysql && docker-php-ext-enable pdo_mysql"
+
+  - name: pdo_pgsql
+    label: PDO PostgreSQL
+    install_command: "apt-get update && apt-get install -y libpq-dev && docker-php-ext-install pdo_pgsql && docker-php-ext-enable pdo_pgsql"
+
+  - name: redis
+    label: Redis
+    install_command: "pecl install redis && docker-php-ext-enable redis"
+
+  - name: memcached
+    label: Memcached
+    install_command: "apt-get update && apt-get install -y libmemcached-dev && pecl install memcached && docker-php-ext-enable memcached"
+
+  - name: mongodb
+    label: MongoDB
+    install_command: "pecl install mongodb && docker-php-ext-enable mongodb"
+
+  # ── 图像处理 ──────────────────────────────────────────────────
+  - name: gd
+    label: GD 图像处理
+    install_command: "apt-get update && apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev libwebp-dev && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp && docker-php-ext-install gd"
+
+  - name: imagick
+    label: ImageMagick
+    install_command: "apt-get update && apt-get install -y libmagickwand-dev && pecl install imagick && docker-php-ext-enable imagick"
+
+  - name: exif
+    label: EXIF 图片元数据
+    install_command: "docker-php-ext-install exif && docker-php-ext-enable exif"
+
+  # ── 字符串/编码 ───────────────────────────────────────────────
+  - name: mbstring
+    label: 多字节字符串
+    install_command: "docker-php-ext-install mbstring && docker-php-ext-enable mbstring"
+
+  - name: intl
+    label: 国际化（intl）
+    install_command: "apt-get update && apt-get install -y libicu-dev && docker-php-ext-install intl && docker-php-ext-enable intl"
+
+  # ── 网络/HTTP ─────────────────────────────────────────────────
+  - name: curl
+    label: cURL HTTP 请求
+    install_command: "apt-get update && apt-get install -y libcurl4-openssl-dev && docker-php-ext-install curl && docker-php-ext-enable curl"
+
+  - name: soap
+    label: SOAP Web Service
+    install_command: "apt-get update && apt-get install -y libxml2-dev && docker-php-ext-install soap && docker-php-ext-enable soap"
+
+  - name: sockets
+    label: Sockets
+    install_command: "docker-php-ext-install sockets && docker-php-ext-enable sockets"
+
+  # ── 文件/压缩 ─────────────────────────────────────────────────
+  - name: zip
+    label: ZIP 压缩
+    install_command: "apt-get update && apt-get install -y libzip-dev && docker-php-ext-install zip && docker-php-ext-enable zip"
+
+  - name: fileinfo
+    label: 文件信息检测
+    install_command: "docker-php-ext-install fileinfo && docker-php-ext-enable fileinfo"
+
+  # ── 加密/安全 ─────────────────────────────────────────────────
+  - name: sodium
+    label: Sodium 现代加密
+    install_command: "docker-php-ext-install sodium && docker-php-ext-enable sodium"
+
+  # ── 性能 ──────────────────────────────────────────────────────
+  - name: opcache
+    label: OPcache 字节码缓存
+    install_command: "docker-php-ext-install opcache && docker-php-ext-enable opcache"
+
+  - name: apcu
+    label: APCu 用户态缓存
+    install_command: "pecl install apcu && docker-php-ext-enable apcu"
+
+  # ── 源码加密/解密 ─────────────────────────────────────────────
+  - name: ioncube
+    label: ionCube Loader（运行 ionCube 加密源码）
+    install_command: >
+      PHP_VER=$(php -r 'echo PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION;') &&
+      curl -fsSL https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz -o /tmp/ioncube.tar.gz &&
+      tar -xzf /tmp/ioncube.tar.gz -C /tmp &&
+      cp /tmp/ioncube/ioncube_loader_lin_${PHP_VER}.so $(php-config --extension-dir)/ &&
+      echo "zend_extension=ioncube_loader_lin_${PHP_VER}.so" > /usr/local/etc/php/conf.d/00-ioncube.ini &&
+      rm -rf /tmp/ioncube /tmp/ioncube.tar.gz
+
+  - name: sourceguardian
+    label: SourceGuardian（运行 SG 加密源码）
+    install_command: >
+      PHP_VER=$(php -r 'echo PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION;') &&
+      PHP_VER_NODOT=$(php -r 'echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;') &&
+      curl -fsSL https://www.sourceguardian.com/loaders/download/loaders.linux-x86_64.tar.gz -o /tmp/sg.tar.gz &&
+      tar -xzf /tmp/sg.tar.gz -C /tmp &&
+      cp /tmp/ixed.${PHP_VER}.lin $(php-config --extension-dir)/sourceguardian.so &&
+      echo "extension=sourceguardian.so" > /usr/local/etc/php/conf.d/sourceguardian.ini &&
+      rm -rf /tmp/ixed.* /tmp/sg.tar.gz
+
+  # ── 协程/异步 ─────────────────────────────────────────────────
+  - name: swoole
+    label: Swoole 协程框架
+    install_command: "pecl install swoole && docker-php-ext-enable swoole"
+
+  # ── 调试 ──────────────────────────────────────────────────────
+  - name: xdebug
+    label: Xdebug 调试器（仅开发环境）
+    install_command: "pecl install xdebug && docker-php-ext-enable xdebug"
+
+  # ── 其他常用 ──────────────────────────────────────────────────
+  - name: bcmath
+    label: BCMath 高精度数学
+    install_command: "docker-php-ext-install bcmath && docker-php-ext-enable bcmath"
+
+  - name: pcntl
+    label: 进程控制（pcntl）
+    install_command: "docker-php-ext-install pcntl && docker-php-ext-enable pcntl"
+
+  - name: posix
+    label: POSIX 函数
+    install_command: "docker-php-ext-install posix && docker-php-ext-enable posix"
+
+  - name: sysvmsg
+    label: System V 消息队列
+    install_command: "docker-php-ext-install sysvmsg && docker-php-ext-enable sysvmsg"
+
+  - name: sysvsem
+    label: System V 信号量
+    install_command: "docker-php-ext-install sysvsem && docker-php-ext-enable sysvsem"
+
+  - name: sysvshm
+    label: System V 共享内存
+    install_command: "docker-php-ext-install sysvshm && docker-php-ext-enable sysvshm"
+
+init_files:
+  - path: /www/server/{{key}}/php.ini
+    file: init/php.ini
+  - path: /www/server/{{key}}/php-fpm.conf
+    file: init/php-fpm.conf
+  - "PHP 已安装，可在网站管理中选择此 PHP 版本"
+  - "在扩展管理中安装所需扩展（如 mysqli、redis 等）"
+  - "修改配置后点击重载配置生效"
+
+install_hints:
+  - "PHP 已安装，可在网站管理中选择此 PHP 版本"
+  - "在扩展管理中安装所需扩展（如 mysqli、redis 等）"
+  - "修改配置后点击重载配置生效"

@@ -1,0 +1,19 @@
+services:
+  php:
+    image: php:{{version}}-fpm-alpine
+    container_name: panel_php_{{version_nodot}}
+    restart: unless-stopped
+    ports:
+      - "{{fpm_port}}:9000"
+    volumes:
+      - /www/wwwroot:/www/wwwroot
+      - /www/server/php_{{version_nodot}}/php.ini:/usr/local/etc/php/php.ini:ro
+      - /www/server/php_{{version_nodot}}/php-fpm.conf:/usr/local/etc/php-fpm.d/www.conf:ro
+      - /www/logs/php_{{version_nodot}}:/var/log/php-fpm
+    networks:
+      - panel_network
+
+networks:
+  panel_network:
+    external: true
+    name: panel_network
