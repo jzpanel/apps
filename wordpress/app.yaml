@@ -9,17 +9,23 @@ versions:
   - "6.6"
   - "6.5"
 default_version: "6.7"
+app_type: cms
+web_root: /www/wwwroot/wordpress
 has_web_ui: true
-health_check_timeout: 90
+health_check_timeout: 0
+
+# 服务类型依赖
+service_dependencies:
+  - type: webserver
+    label: Web 服务器（Nginx/OpenResty/Apache）
+  - type: php
+    label: PHP 运行环境
+
+# 精确应用依赖
 dependencies:
   - mysql
 
 params:
-  - key: port
-    label: 访问端口
-    type: number
-    default: 8090
-    required: true
   - key: db_name
     label: 数据库名
     type: text
@@ -42,159 +48,13 @@ params:
     default: wp_
     required: true
 
-compose_vars:
-  - placeholder: "{{mysql_host}}"
-    source: registry_password
-    registry_type: mysql
-    template: "panel_mysql"
-    empty_value: "panel_mysql"
-
 db_init:
   registry_type: mysql
   db_name_param: db_name
   db_user_param: db_user
   db_password_param: db_password
 
-manage:
-  - key: PHP_MEMORY_LIMIT
-    label: PHP 内存限制
-    type: select
-    description: WordPress 进程可使用的最大内存
-    options:
-      - value: 128M
-        label: 128M（默认）
-      - value: 256M
-        label: 256M（推荐）
-      - value: 512M
-        label: 512M（大型站点）
-    restart_required: true
-    file_path: /www/server/wordpress/php.ini
-    ini_section: PHP
-
-  - key: upload_max_filesize
-    label: 最大上传文件大小
-    type: select
-    description: 媒体文件上传大小限制
-    options:
-      - value: 32M
-        label: 32M
-      - value: 64M
-        label: 64M（推荐）
-      - value: 128M
-        label: 128M
-      - value: 256M
-        label: 256M（大文件）
-    restart_required: true
-    file_path: /www/server/wordpress/php.ini
-    ini_section: PHP
-
-  - key: post_max_size
-    label: POST 数据最大大小
-    type: select
-    description: 应大于上传文件大小限制
-    options:
-      - value: 64M
-        label: 64M
-      - value: 128M
-        label: 128M（推荐）
-      - value: 256M
-        label: 256M
-    restart_required: true
-    file_path: /www/server/wordpress/php.ini
-    ini_section: PHP
-
-  - key: max_execution_time
-    label: 最大执行时间（秒）
-    type: number
-    description: PHP 脚本最大执行时间，导入大文件时需要增大
-    restart_required: true
-    file_path: /www/server/wordpress/php.ini
-    ini_section: PHP
-
-  - key: WP_DEBUG
-    label: 调试模式
-    type: switch
-    description: 开启后显示 PHP 错误和警告，仅开发环境使用
-    restart_required: true
-    file_path: /www/server/wordpress/wp-config-extra.php
-    ini_section: wp
-
-  - key: WP_CACHE
-    label: 对象缓存
-    type: switch
-    description: 开启 WordPress 对象缓存，需要安装缓存插件
-    restart_required: true
-    file_path: /www/server/wordpress/wp-config-extra.php
-    ini_section: wp
-
-  - key: DISALLOW_FILE_EDIT
-    label: 禁止后台编辑文件
-    type: switch
-    description: 开启后禁止通过 WordPress 后台编辑主题/插件文件，提升安全性
-    restart_required: true
-    file_path: /www/server/wordpress/wp-config-extra.php
-    ini_section: wp
-
-  - key: FORCE_SSL_ADMIN
-    label: 强制后台使用 HTTPS
-    type: switch
-    description: 开启后 WordPress 后台登录强制使用 HTTPS
-    restart_required: true
-    file_path: /www/server/wordpress/wp-config-extra.php
-    ini_section: wp
-
-actions:
-  - id: clear_cache
-    label: 清理缓存
-    icon: trash
-    confirm: false
-    danger: false
-    exec: "wp --allow-root --path=/var/www/html cache flush 2>/dev/null || echo '请安装 WP-CLI 或使用缓存插件清理'"
-
-  - id: update_db
-    label: 更新数据库
-    icon: refresh
-    confirm: true
-    danger: false
-    exec: "wp --allow-root --path=/var/www/html core update-db 2>/dev/null || echo '请手动访问 /wp-admin/upgrade.php 更新'"
-
-  - id: list_plugins
-    label: 查看已安装插件
-    icon: list
-    confirm: false
-    danger: false
-    exec: "wp --allow-root --path=/var/www/html plugin list 2>/dev/null || echo 'WP-CLI 未安装'"
-
-  - id: check_updates
-    label: 检查可用更新
-    icon: info
-    confirm: false
-    danger: false
-    exec: "wp --allow-root --path=/var/www/html core check-update 2>/dev/null && wp --allow-root --path=/var/www/html plugin list --update=available 2>/dev/null || echo 'WP-CLI 未安装'"
-
-init_files:
-  - path: /www/server/wordpress/php.ini
-    file: init/php.ini
-  - path: /www/server/wordpress/wp-config-extra.php
-    content: |
-      <?php
-      // 此文件由面板管理，请勿手动修改
-      define('WP_DEBUG', false);
-      define('WP_CACHE', false);
-      define('DISALLOW_FILE_EDIT', false);
-      define('FORCE_SSL_ADMIN', false);
-
 install_hints:
-  - "访问 http://服务器IP:端口 完成 WordPress 安装向导"
-  - "数据库已自动配置，安装向导中直接点击下一步即可"
-  - "建议安装完成后通过 Nginx 反向代理并配置 HTTPS"
-
-install_guide:
-  description: "WordPress 已安装，访问以下地址完成初始化配置："
-  features:
-    - "安装向导 - 访问站点地址完成 WordPress 初始化"
-    - "数据库已配置 - 无需手动填写数据库信息"
-    - "反向代理 - 建议通过 Nginx 配置域名访问"
-  primary_action:
-    label: "查看应用详情"
-    route: "/apps"
+  - "访问 http://服务器IP 完成 WordPress 安装向导"
+  - "在网站管理中绑定域名、配置 PHP、申请 SSL 证书"
+  - "数据库已自动创建，安装向导中直接填写数据库信息即可"
