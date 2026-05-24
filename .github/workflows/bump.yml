@@ -9,10 +9,11 @@ on:
 
 jobs:
   bump:
-    # 防止循环：跳过 jzpanel-bot 自身的 commit，以及含 [skip-bump] tag 的 commit
-    if: |
-      github.event.head_commit.author.email != 'bot@jzpanel.top' &&
-      !contains(github.event.head_commit.message, '[skip-bump]')
+    # 防止循环：跳过 jzpanel-bot 自身的 commit。
+    # [skip-bump] 标记的精确检测（仅匹配标题行末尾）放到下面 step 里做，避免
+    # commit 正文出现字面量 [skip-bump] 被误判（GitHub Actions if 表达式
+    # 不支持取首行，所以 contains 全文太宽松）。
+    if: github.event.head_commit.author.email != 'bot@jzpanel.top'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -22,17 +23,35 @@ jobs:
           fetch-depth: 2
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Check skip-bump tag (title line only)
+        id: skipcheck
+        env:
+          MSG: ${{ github.event.head_commit.message }}
+        run: |
+          set -euo pipefail
+          # 只看 commit message 的标题行（第一行）
+          TITLE=$(printf '%s' "$MSG" | head -n1)
+          if printf '%s' "$TITLE" | grep -q '\[skip-bump\]'; then
+            echo "Title line has [skip-bump] tag, skipping bump."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/setup-go@v5
+        if: steps.skipcheck.outputs.skip != 'true'
         with:
           go-version: '1.22'
           cache-dependency-path: scripts/go.sum
 
       - name: Compute new version
+        if: steps.skipcheck.outputs.skip != 'true'
         id: bump
         working-directory: scripts
         run: go run compute-bump.go
 
       - name: Update version.json
+        if: steps.skipcheck.outputs.skip != 'true'
         env:
           NEW_VERSION: ${{ steps.bump.outputs.version }}
           NEW_CHANGELOG: ${{ steps.bump.outputs.changelog }}
@@ -47,6 +66,7 @@ jobs:
           mv version.json.tmp version.json
 
       - name: Commit and push
+        if: steps.skipcheck.outputs.skip != 'true'
         env:
           NEW_VERSION: ${{ steps.bump.outputs.version }}
         run: |
@@ -62,7 +82,7 @@ jobs:
           git push
 
       - name: Purge jsDelivr cache
-        if: always()
+        if: steps.skipcheck.outputs.skip != 'true'
         continue-on-error: true
         run: |
           curl -fsSL "https://purge.jsdelivr.net/gh/jzpanel/apps@main/version.json" || true
