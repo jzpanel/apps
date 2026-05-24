@@ -1,13 +1,20 @@
 services:
   apache:
-    image: httpd:{{version}}
+    image: httpd:{{tag}}
     container_name: panel_apache
     restart: unless-stopped
     network_mode: host
     volumes:
       - /www/wwwroot:/www/wwwroot
       - /www/server/apache/httpd.conf:/usr/local/apache2/conf/httpd.conf:ro
-      - /www/server/apache/vhosts:/usr/local/apache2/conf/vhosts
+      - /www/server/apache/conf/vhost:/usr/local/apache2/conf/vhost
       - /www/logs/apache:/usr/local/apache2/logs
       - /www/wwwlogs:/www/wwwlogs
       - /www/server/apache/ssl:/usr/local/apache2/conf/ssl
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}

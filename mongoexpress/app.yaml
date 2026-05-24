@@ -5,9 +5,18 @@ description: MongoDB 的轻量级 Web 管理界面，支持数据库浏览、文
 source: official
 icon: icon.svg
 versions:
-  - "1.0"
-  - "0.54"
+  - display: "1.0"
+    tag: "1.0.2"
+    image: mongo-express
+    architectures: [amd64, arm64]
+    is_default: true
+  - display: "0.54"
+    tag: "0.54"
+    image: mongo-express
+    architectures: [amd64, arm64]
+    deprecated: true
 default_version: "1.0"
+architectures: [amd64, arm64]
 has_web_ui: true
 health_check_timeout: 30
 dependencies:
@@ -83,6 +92,21 @@ actions:
 install_hints:
   - "通过浏览器访问 http://服务器IP:端口 进入管理界面"
   - "使用安装时设置的用户名密码登录"
+
+resource_limits:
+  memory_mb: 128
+  cpus: 0.5
+  mem_reserve_mb: 64
+
+tabs:
+  - id: performance
+    label: 性能
+    type: performance
+
+proxy_spec:
+  port_param: port
+  ws_support: false
+  description: "通过域名访问 Mongo Express，建议配置 HTTPS 保护数据库管理界面"
 
 install_guide:
   description: "Mongo Express 已安装，可以通过浏览器管理 MongoDB："

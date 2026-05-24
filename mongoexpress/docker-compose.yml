@@ -1,6 +1,6 @@
 services:
   mongoexpress:
-    image: mongo-express:{{version}}
+    image: mongo-express:{{tag}}
     container_name: panel_mongoexpress
     restart: unless-stopped
     ports:
@@ -12,6 +12,13 @@ services:
       ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
     networks:
       - panel_network
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}
 
 networks:
   panel_network:

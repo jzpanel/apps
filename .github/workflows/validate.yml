@@ -1,0 +1,29 @@
+name: Validate App Versions
+
+on:
+  pull_request:
+    paths:
+      - '**/app.yaml'
+      - '**/docker-compose.yml'
+      - 'scripts/**'
+  push:
+    branches: [main]
+    paths:
+      - '**/app.yaml'
+      - '**/docker-compose.yml'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache-dependency-path: scripts/go.sum
+
+      - name: Validate yaml versions
+        working-directory: scripts
+        run: go run check-versions.go --apps-dir ..

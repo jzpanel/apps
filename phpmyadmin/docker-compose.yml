@@ -1,6 +1,6 @@
 services:
   phpmyadmin:
-    image: phpmyadmin:{{version}}
+    image: phpmyadmin:{{tag}}
     container_name: panel_phpmyadmin
     restart: unless-stopped
     ports:
@@ -13,6 +13,13 @@ services:
       - /www/server/phpmyadmin/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
     networks:
       - panel_network
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}
 
 networks:
   panel_network:

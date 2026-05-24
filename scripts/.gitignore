@@ -1,0 +1,4 @@
+# Build artifacts
+check-versions
+check-versions.exe
+*.exe

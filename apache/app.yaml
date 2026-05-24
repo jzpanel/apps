@@ -5,8 +5,13 @@ description: 世界上使用最广泛的 Web 服务器，支持 .htaccess 动态
 source: official
 icon: icon.svg
 versions:
-  - "2.4"
+  - display: "2.4"
+    tag: "2.4-alpine"
+    image: httpd
+    architectures: [amd64, arm64]
+    is_default: true
 default_version: "2.4"
+architectures: [amd64, arm64]
 service_type: webserver
 has_web_ui: false
 health_check_timeout: 30
@@ -121,14 +126,14 @@ actions:
     icon: code
     confirm: true
     danger: false
-    exec: "a2enmod rewrite && apachectl graceful"
+    exec: "sed -i 's/#LoadModule rewrite_module/LoadModule rewrite_module/' /usr/local/apache2/conf/httpd.conf && apachectl graceful"
 
   - id: enable_ssl
     label: 启用 SSL 模块
     icon: lock
     confirm: true
     danger: false
-    exec: "a2enmod ssl && apachectl graceful"
+    exec: "sed -i 's/#LoadModule ssl_module/LoadModule ssl_module/' /usr/local/apache2/conf/httpd.conf && apachectl graceful"
 
 init_files:
   - path: /www/server/apache/httpd.conf
@@ -148,3 +153,13 @@ install_guide:
   primary_action:
     label: "创建第一个网站"
     route: "/website"
+
+resource_limits:
+  memory_mb: 256
+  cpus: 1.0
+  mem_reserve_mb: 64
+
+tabs:
+  - id: performance
+    label: 性能
+    type: performance

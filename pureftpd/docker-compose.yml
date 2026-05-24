@@ -1,6 +1,6 @@
 services:
   pureftpd:
-    image: stilliard/pure-ftpd:{{version}}
+    image: stilliard/pure-ftpd:{{tag}}
     container_name: panel_pureftpd
     restart: unless-stopped
     ports:
@@ -16,6 +16,13 @@ services:
       - /www/server/pureftpd/ssl:/etc/ssl/private
     networks:
       - panel_network
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}
 
 networks:
   panel_network:

@@ -5,10 +5,26 @@ description: 面向文档的 NoSQL 数据库，灵活的 JSON 数据模型，适
 source: official
 icon: icon.svg
 versions:
-  - "7.0"
-  - "6.0"
-  - "5.0"
-default_version: "7.0"
+  - display: "8.0"
+    tag: "8.0"
+    image: mongo
+    architectures: [amd64, arm64]
+    is_default: true
+  - display: "7.0"
+    tag: "7.0"
+    image: mongo
+    architectures: [amd64, arm64]
+  - display: "6.0"
+    tag: "6.0"
+    image: mongo
+    architectures: [amd64, arm64]
+  - display: "5.0"
+    tag: "5.0"
+    image: mongo
+    architectures: [amd64, arm64]
+    deprecated: true
+default_version: "8.0"
+architectures: [amd64, arm64]
 service_type: database
 db_type: mongodb
 has_web_ui: false
@@ -31,15 +47,13 @@ manage:
   - key: net.maxIncomingConnections
     label: 最大连接数
     type: number
-    description: 允许的最大客户端连接数
+    description: 允许的最大客户端连接数（修改后需在"配置文件"tab 手动编辑 mongod.conf 并重启）
     restart_required: true
-    file_path: /www/server/mongodb/mongod.conf
-    ini_section: net
 
   - key: storage.wiredTiger.engineConfig.cacheSizeGB
     label: WiredTiger 缓存大小（GB）
     type: select
-    description: 建议设为可用内存的 50%，默认为系统内存的 50% 或 256MB 取较大值
+    description: 建议设为可用内存的 50%（修改后需在"配置文件"tab 手动编辑 mongod.conf 并重启）
     options:
       - value: "0.25"
         label: 0.25GB（512MB 内存）
@@ -52,21 +66,17 @@ manage:
       - value: "4"
         label: 4GB（8GB 内存）
     restart_required: true
-    file_path: /www/server/mongodb/mongod.conf
-    ini_section: storage
 
   - key: operationProfiling.slowOpThresholdMs
     label: 慢操作阈值（毫秒）
     type: number
-    description: 超过此时间的操作记录到 profiler，-1 禁用，0 记录所有
-    restart_required: false
-    file_path: /www/server/mongodb/mongod.conf
-    ini_section: operationProfiling
+    description: 超过此时间的操作记录到 profiler，-1 禁用，0 记录所有（修改后需在"配置文件"tab 手动编辑 mongod.conf 并重启）
+    restart_required: true
 
   - key: operationProfiling.mode
     label: 性能分析模式
     type: select
-    description: off=关闭，slowOp=仅慢操作，all=所有操作
+    description: off=关闭，slowOp=仅慢操作，all=所有操作（修改后需在"配置文件"tab 手动编辑 mongod.conf 并重启）
     options:
       - value: "off"
         label: off（关闭）
@@ -74,14 +84,12 @@ manage:
         label: slowOp（仅慢操作，推荐）
       - value: all
         label: all（所有操作，影响性能）
-    restart_required: false
-    file_path: /www/server/mongodb/mongod.conf
-    ini_section: operationProfiling
+    restart_required: true
 
   - key: systemLog.verbosity
     label: 日志详细程度
     type: select
-    description: 0=默认，1-5 逐渐增加详细程度
+    description: 0=默认，1-5 逐渐增加详细程度（修改后需在"配置文件"tab 手动编辑 mongod.conf 并重启）
     options:
       - value: "0"
         label: "0（默认）"
@@ -89,9 +97,7 @@ manage:
         label: "1（详细）"
       - value: "2"
         label: "2（调试）"
-    restart_required: false
-    file_path: /www/server/mongodb/mongod.conf
-    ini_section: systemLog
+    restart_required: true
 
 actions:
   - id: compact
@@ -99,21 +105,21 @@ actions:
     icon: compress
     confirm: true
     danger: false
-    exec: "mongosh --username root --password $MONGO_INITDB_ROOT_PASSWORD --eval 'db.adminCommand({listDatabases:1}).databases.forEach(d => { if(d.name !== \"admin\" && d.name !== \"local\" && d.name !== \"config\") { db.getSiblingDB(d.name).runCommand({compact: db.getSiblingDB(d.name).getCollectionNames()[0]}) } })' 2>&1 | head -20"
+    exec: "mongosh --username root --password \"$MONGO_INITDB_ROOT_PASSWORD\" --eval 'db.adminCommand({listDatabases:1}).databases.forEach(d => { if(d.name !== \"admin\" && d.name !== \"local\" && d.name !== \"config\") { db.getSiblingDB(d.name).runCommand({compact: db.getSiblingDB(d.name).getCollectionNames()[0]}) } })' 2>&1 | head -20"
 
   - id: server_status
     label: 查看服务状态
     icon: info
     confirm: false
     danger: false
-    exec: "mongosh --username root --password $MONGO_INITDB_ROOT_PASSWORD --eval 'db.adminCommand({serverStatus:1})' --quiet 2>&1 | head -50"
+    exec: "mongosh --username root --password \"$MONGO_INITDB_ROOT_PASSWORD\" --eval 'db.adminCommand({serverStatus:1})' --quiet 2>&1 | head -50"
 
   - id: current_ops
     label: 查看当前操作
     icon: list
     confirm: false
     danger: false
-    exec: "mongosh --username root --password $MONGO_INITDB_ROOT_PASSWORD --eval 'db.adminCommand({currentOp:1, active:true})' --quiet 2>&1 | head -30"
+    exec: "mongosh --username root --password \"$MONGO_INITDB_ROOT_PASSWORD\" --eval 'db.adminCommand({currentOp:1, active:true})' --quiet 2>&1 | head -30"
 
 init_files:
   - path: /www/server/mongodb/mongod.conf
@@ -131,3 +137,13 @@ install_guide:
   primary_action:
     label: "前往数据库管理"
     route: "/database"
+
+resource_limits:
+  memory_mb: 512
+  cpus: 1.0
+  mem_reserve_mb: 256
+
+tabs:
+  - id: performance
+    label: 性能
+    type: performance

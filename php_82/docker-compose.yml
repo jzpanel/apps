@@ -1,6 +1,6 @@
 ﻿services:
   php:
-    image: php:8.2-fpm-alpine
+    image: php:{{tag}}
     container_name: panel_php_82
     restart: unless-stopped
     ports:
@@ -12,6 +12,13 @@
       - /www/logs/php_82:/var/log/php-fpm
     networks:
       - panel_network
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}
 
 networks:
   panel_network:

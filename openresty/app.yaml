@@ -5,9 +5,23 @@ description: 基于 Nginx 的高性能 Web 平台，内置 LuaJIT，支持动态
 source: official
 icon: icon.svg
 versions:
-  - "1.25"
-  - "1.21"
-default_version: "1.25"
+  - display: "1.27"
+    tag: "1.27.1.2-alpine"
+    image: openresty/openresty
+    architectures: [amd64, arm64]
+    is_default: true
+  - display: "1.25"
+    tag: "1.25.3.2-alpine"
+    image: openresty/openresty
+    architectures: [amd64, arm64]
+    deprecated: true
+  - display: "1.21"
+    tag: "1.21.4.4-alpine"
+    image: openresty/openresty
+    architectures: [amd64, arm64]
+    deprecated: true
+default_version: "1.27"
+architectures: [amd64, arm64]
 service_type: webserver
 has_web_ui: false
 health_check_timeout: 30
@@ -40,7 +54,7 @@ manage:
         label: "4"
       - value: "8"
         label: "8"
-    restart_required: true
+    restart_required: false
     file_path: /www/server/openresty/nginx.conf
     ini_section: main
 
@@ -58,7 +72,7 @@ manage:
         label: "8192"
       - value: "65535"
         label: "65535（高并发）"
-    restart_required: true
+    restart_required: false
     file_path: /www/server/openresty/nginx.conf
     ini_section: events
 
@@ -160,3 +174,13 @@ install_guide:
   primary_action:
     label: "创建第一个网站"
     route: "/website"
+
+resource_limits:
+  memory_mb: 128
+  cpus: 0.5
+  mem_reserve_mb: 32
+
+tabs:
+  - id: performance
+    label: 性能
+    type: performance

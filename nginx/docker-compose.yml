@@ -1,6 +1,6 @@
 services:
   nginx:
-    image: nginx:{{version}}
+    image: nginx:{{tag}}
     container_name: panel_nginx
     restart: unless-stopped
     network_mode: host
@@ -12,3 +12,10 @@ services:
       - /www/logs/nginx:/www/logs/nginx
       - /www/wwwlogs:/www/wwwlogs
       - /www/server/nginx/ssl:/etc/nginx/ssl
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}

@@ -1,6 +1,6 @@
 services:
   mysql:
-    image: mysql:{{version}}
+    image: mysql:{{tag}}
     container_name: panel_mysql
     restart: unless-stopped
     ports:
@@ -14,6 +14,13 @@ services:
       - /www/logs/mysql:/var/log/mysql
     networks:
       - panel_network
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}
 
 networks:
   panel_network:

@@ -1,0 +1,69 @@
+name: Auto Bump version.json
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**/app.yaml'
+      - '**/docker-compose.yml'
+
+jobs:
+  bump:
+    # 防止循环：跳过 jzpanel-bot 自身的 commit，以及含 [skip-bump] tag 的 commit
+    if: |
+      github.event.head_commit.author.email != 'bot@jzpanel.top' &&
+      !contains(github.event.head_commit.message, '[skip-bump]')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache-dependency-path: scripts/go.sum
+
+      - name: Compute new version
+        id: bump
+        working-directory: scripts
+        run: go run compute-bump.go
+
+      - name: Update version.json
+        env:
+          NEW_VERSION: ${{ steps.bump.outputs.version }}
+          NEW_CHANGELOG: ${{ steps.bump.outputs.changelog }}
+        run: |
+          set -euo pipefail
+          NOW=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          jq --arg v "$NEW_VERSION" \
+             --arg c "$NEW_CHANGELOG" \
+             --arg u "$NOW" \
+             '.version = $v | .changelog = $c | .updated_at = $u' \
+             version.json > version.json.tmp
+          mv version.json.tmp version.json
+
+      - name: Commit and push
+        env:
+          NEW_VERSION: ${{ steps.bump.outputs.version }}
+        run: |
+          set -euo pipefail
+          git config user.name "jzpanel-bot"
+          git config user.email "bot@jzpanel.top"
+          git add version.json
+          if git diff --staged --quiet; then
+            echo "no changes to version.json, skip commit"
+            exit 0
+          fi
+          git commit -m "chore(apps): bump version to $NEW_VERSION [skip-bump]"
+          git push
+
+      - name: Purge jsDelivr cache
+        if: always()
+        continue-on-error: true
+        run: |
+          curl -fsSL "https://purge.jsdelivr.net/gh/jzpanel/apps@main/version.json" || true
+          curl -fsSL "https://purge.jsdelivr.net/gh/jzpanel/apps@main/apps.tar.gz" || true

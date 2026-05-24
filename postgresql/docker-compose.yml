@@ -1,6 +1,6 @@
 services:
   postgresql:
-    image: postgres:{{version}}-alpine
+    image: postgres:{{tag}}
     container_name: panel_postgresql
     restart: unless-stopped
     ports:
@@ -17,6 +17,13 @@ services:
     command: postgres -c config_file=/etc/postgresql/postgresql.conf -c hba_file=/etc/postgresql/pg_hba.conf
     networks:
       - panel_network
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}
 
 networks:
   panel_network:
