@@ -85,5 +85,5 @@ jobs:
         if: steps.skipcheck.outputs.skip != 'true'
         continue-on-error: true
         run: |
+          # 只 purge version.json（jsDelivr 不存 tar.gz，对应文件本就不存在）
           curl -fsSL "https://purge.jsdelivr.net/gh/jzpanel/apps@main/version.json" || true
-          curl -fsSL "https://purge.jsdelivr.net/gh/jzpanel/apps@main/apps.tar.gz" || true
