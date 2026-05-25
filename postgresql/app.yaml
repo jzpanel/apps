@@ -29,6 +29,16 @@ db_type: pgsql
 has_web_ui: false
 health_check_timeout: 60
 
+# 容器内 postgres 进程以 UID 70 运行；预先 chown 数据/日志目录避免 Permission denied
+volumes_init:
+  - path: /www/server/postgresql/data
+    uid: 70
+    gid: 70
+    mode: "0700"
+  - path: /www/logs/postgresql
+    uid: 70
+    gid: 70
+
 params:
   - key: port
     label: 端口

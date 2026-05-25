@@ -26,6 +26,16 @@ db_type: mysql
 has_web_ui: false
 health_check_timeout: 60
 
+# 容器内 mysql 进程以 UID 999 运行；预先 chown 数据/日志目录
+volumes_init:
+  - path: /www/server/mysql/data
+    uid: 999
+    gid: 999
+    mode: "0750"
+  - path: /www/logs/mysql
+    uid: 999
+    gid: 999
+
 params:
   - key: port
     label: 端口

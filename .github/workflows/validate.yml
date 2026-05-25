@@ -27,3 +27,7 @@ jobs:
       - name: Validate yaml versions
         working-directory: scripts
         run: go run check-versions.go --apps-dir ..
+
+      - name: Lint volumes_init declarations
+        working-directory: scripts
+        run: go run lint-volumes-init.go --apps-dir .. --strict

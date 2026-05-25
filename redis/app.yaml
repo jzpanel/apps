@@ -26,6 +26,16 @@ db_type: redis
 has_web_ui: false
 health_check_timeout: 30
 
+# 容器内 redis 进程以 UID 999 运行；预先 chown 数据/日志目录
+volumes_init:
+  - path: /www/server/redis/data
+    uid: 999
+    gid: 1000
+    mode: "0750"
+  - path: /www/logs/redis
+    uid: 999
+    gid: 1000
+
 params:
   - key: port
     label: 端口
