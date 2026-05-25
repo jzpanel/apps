@@ -1,5 +1,5 @@
-﻿{
-  "version": "1.0.2",
-  "updated_at": "2026-05-25T00:00:00Z",
-  "changelog": "本次更新涉及 17 个应用：apache, mongodb, mongoexpress, mysql, nginx, openresty, pgweb, php_74, php_80, php_81, php_82, php_83, phpmyadmin, postgresql, pureftpd, redis, wordpress。详见 git log。"
+{
+  "version": "1.0.3",
+  "updated_at": "2026-05-25T00:44:50Z",
+  "changelog": "本次更新涉及 4 个应用：mongodb, mysql, postgresql, redis。详见 git log。"
 }
