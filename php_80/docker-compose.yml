@@ -1,0 +1,18 @@
+﻿services:
+  php:
+    image: jzpanel/php:{{tag}}
+    container_name: panel_php_80
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - /www/wwwroot:/www/wwwroot
+      - /www/server/php_80/php.ini:/usr/local/etc/php/php.ini:ro
+      - /www/server/php_80/php-fpm.conf:/usr/local/etc/php-fpm.d/www.conf:ro
+      - /www/logs/php_80:/var/log/php-fpm
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}

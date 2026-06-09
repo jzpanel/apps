@@ -1,0 +1,72 @@
+key: phpmyadmin
+name: phpMyAdmin
+category: tools
+description: MySQL/MariaDB 的 Web 管理界面，支持数据库管理、SQL 执行、数据导入导出
+source: official
+icon: icon.svg
+versions:
+  - display: "5.2"
+    tag: "5.2"
+    image: phpmyadmin
+    architectures: [amd64, arm64]
+    is_default: true
+  - display: "5.1"
+    tag: "5.1"
+    image: phpmyadmin
+    architectures: [amd64, arm64]
+    deprecated: true
+default_version: "5.2"
+architectures: [amd64, arm64]
+has_web_ui: true
+health_check_timeout: 30
+dependencies:
+  - mysql
+
+params:
+  - key: port
+    label: 访问端口
+    type: number
+    default: 8080
+    required: true
+
+compose_vars:
+  - placeholder: "{{pma_host}}"
+    source: registry_password
+    registry_type: mysql
+    template: "panel_mysql"
+    empty_value: "panel_mysql"
+
+manage: []
+
+init_files:
+  - path: /www/server/phpmyadmin/config.user.inc.php
+    file: init/config.user.inc.php
+
+install_hints:
+  - "通过浏览器访问 http://服务器IP:端口 进入管理界面"
+  - "使用 MySQL root 账号登录"
+
+resource_limits:
+  memory_mb: 256
+  cpus: 0.5
+  mem_reserve_mb: 128
+
+tabs:
+  - id: performance
+    label: 性能
+    type: performance
+
+proxy_spec:
+  port_param: port
+  ws_support: false
+  description: "通过域名访问 phpMyAdmin，建议配置 HTTPS 保护数据库管理界面"
+
+install_guide:
+  description: "phpMyAdmin 已安装，可以通过浏览器管理 MySQL 数据库："
+  features:
+    - "数据库管理 - 创建、删除、修改数据库和表"
+    - "SQL 执行 - 直接执行 SQL 语句"
+    - "数据导入导出 - 支持 SQL、CSV 等格式"
+  primary_action:
+    label: "打开 phpMyAdmin"
+    route: "/apps"

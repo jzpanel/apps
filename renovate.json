@@ -1,0 +1,49 @@
+{
+  "extends": [
+    "config:recommended"
+  ],
+  "schedule": [
+    "after 1am every weekday"
+  ],
+  "labels": [
+    "dependencies"
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "(^|/)[^/]+/app\\.yaml$"
+      ],
+      "matchStrings": [
+        "tag:\\s*[\"']?(?<currentValue>[^\"'\\s]+)[\"']?\\s*(\\r?\\n\\s+(?:[a-z_]+:\\s+\\S.*\\s*\\r?\\n\\s+)*?)?image:\\s+(?<depName>[\\w./-]+)"
+      ],
+      "datasourceTemplate": "docker"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "pinDigest"
+      ],
+      "automerge": true,
+      "platformAutomerge": true
+    },
+    {
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "major"
+      ],
+      "labels": [
+        "needs-review"
+      ],
+      "automerge": false
+    }
+  ]
+}

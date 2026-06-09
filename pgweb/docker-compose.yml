@@ -1,0 +1,23 @@
+services:
+  pgweb:
+    image: sosedoff/pgweb:{{tag}}
+    container_name: panel_pgweb
+    restart: unless-stopped
+    ports:
+      - "{{port}}:8081"
+    environment:
+      DATABASE_URL: "{{pgweb_db_url}}"
+    networks:
+      - panel_network
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}
+
+networks:
+  panel_network:
+    external: true
+    name: panel_network

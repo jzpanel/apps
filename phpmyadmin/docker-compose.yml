@@ -1,0 +1,27 @@
+services:
+  phpmyadmin:
+    image: phpmyadmin:{{tag}}
+    container_name: panel_phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "{{port}}:80"
+    environment:
+      PMA_HOST: "{{pma_host}}"
+      PMA_PORT: 3306
+      UPLOAD_LIMIT: 256M
+    volumes:
+      - /www/server/phpmyadmin/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
+    networks:
+      - panel_network
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}
+
+networks:
+  panel_network:
+    external: true
+    name: panel_network

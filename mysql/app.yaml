@@ -1,0 +1,175 @@
+key: mysql
+name: MySQL
+category: database
+description: 世界上最流行的开源关系型数据库，稳定可靠，生态完善
+source: official
+icon: icon.svg
+versions:
+  - display: "8.4"
+    tag: "8.4"
+    image: mysql
+    architectures: [amd64, arm64]
+    is_default: true
+  - display: "8.0"
+    tag: "8.0"
+    image: mysql
+    architectures: [amd64, arm64]
+  - display: "5.7"
+    tag: "5.7"
+    image: mysql
+    architectures: [amd64]
+    deprecated: true
+default_version: "8.4"
+architectures: [amd64, arm64]
+service_type: database
+db_type: mysql
+has_web_ui: false
+health_check_timeout: 60
+
+# 容器内 mysql 进程以 UID 999 运行；预先 chown 数据/日志目录
+volumes_init:
+  - path: /www/server/mysql/data
+    uid: 999
+    gid: 999
+    mode: "0750"
+  - path: /www/logs/mysql
+    uid: 999
+    gid: 999
+
+params:
+  - key: port
+    label: 端口
+    type: number
+    default: 3306
+    required: true
+  - key: root_password
+    label: Root 密码
+    type: password
+    default: ""
+    required: true
+    auto_generate: true
+
+manage:
+  - key: max_connections
+    label: 最大连接数
+    type: number
+    description: 允许的最大客户端连接数，根据内存调整（每连接约 1MB）
+    restart_required: true
+    file_path: /www/server/mysql/my.cnf
+    ini_section: mysqld
+
+  - key: innodb_buffer_pool_size
+    label: InnoDB 缓冲池大小
+    type: select
+    description: 建议设为可用内存的 70-80%，对性能影响最大
+    options:
+      - value: 128M
+        label: 128M（1GB 内存服务器）
+      - value: 256M
+        label: 256M
+      - value: 512M
+        label: 512M（推荐 2GB+）
+      - value: 1G
+        label: 1G（推荐 4GB+）
+      - value: 2G
+        label: 2G（推荐 8GB+）
+      - value: 4G
+        label: 4G（推荐 16GB+）
+    restart_required: true
+    file_path: /www/server/mysql/my.cnf
+    ini_section: mysqld
+
+  - key: max_allowed_packet
+    label: 最大数据包大小
+    type: select
+    description: 限制单次查询/插入的最大数据量（MySQL 8.0 需要重启生效）
+    options:
+      - value: 16M
+        label: 16M（默认）
+      - value: 32M
+        label: 32M
+      - value: 64M
+        label: 64M（推荐）
+      - value: 128M
+        label: 128M
+      - value: 256M
+        label: 256M（大文件场景）
+    restart_required: true
+    file_path: /www/server/mysql/my.cnf
+    ini_section: mysqld
+
+  - key: character_set_server
+    label: 默认字符集
+    type: select
+    description: 新建数据库的默认字符集
+    options:
+      - value: utf8mb4
+        label: utf8mb4（推荐，支持 emoji）
+      - value: utf8
+        label: utf8
+      - value: latin1
+        label: latin1
+    restart_required: true
+    file_path: /www/server/mysql/my.cnf
+    ini_section: mysqld
+
+  - key: slow_query_log
+    label: 慢查询日志
+    type: switch
+    description: 记录执行时间超过阈值的查询，用于性能分析
+    bool_format: "1/0"
+    restart_required: false
+    file_path: /www/server/mysql/my.cnf
+    ini_section: mysqld
+
+  - key: long_query_time
+    label: 慢查询阈值（秒）
+    type: number
+    description: 超过此时间的查询记录到慢查询日志
+    restart_required: false
+    file_path: /www/server/mysql/my.cnf
+    ini_section: mysqld
+
+  - key: innodb_flush_log_at_trx_commit
+    label: 事务日志刷新策略
+    type: select
+    description: "1=最安全（每次提交刷盘），2=性能与安全平衡，0=最高性能（有丢数据风险）"
+    options:
+      - value: "1"
+        label: "1（最安全，推荐生产）"
+      - value: "2"
+        label: "2（平衡）"
+      - value: "0"
+        label: "0（最高性能，有风险）"
+    restart_required: false
+    file_path: /www/server/mysql/my.cnf
+    ini_section: mysqld
+
+init_files:
+  - path: /www/server/mysql/my.cnf
+    file: init/my.cnf
+
+install_hints:
+  - "数据库管理 → 可以创建和管理 MySQL 数据库"
+  - "计划任务 → 可以设置数据库自动备份"
+  - "网站管理 → 创建网站时可配置数据库连接"
+
+resource_limits:
+  memory_mb: 512
+  cpus: 1.0
+  mem_reserve_mb: 256
+
+tabs:
+  - id: performance
+    label: 性能
+    type: performance
+
+install_guide:
+  description: "已自动注册为默认 MySQL 服务，现在可以在以下模块中使用："
+  features:
+    - "数据库管理 - 创建和管理 MySQL 数据库"
+    - "计划任务 - 设置数据库自动备份"
+    - "网站管理 - 为网站配置数据库连接"
+  primary_action:
+    label: "前往数据库管理"
+    route: "/database"

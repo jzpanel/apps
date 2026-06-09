@@ -1,0 +1,24 @@
+services:
+  pureftpd:
+    image: stilliard/pure-ftpd:{{tag}}
+    container_name: panel_pureftpd
+    restart: unless-stopped
+    # host 网络模式：FTP 被动模式（PASV）需要直接绑定宿主机网络
+    # 使用 bridge 网络时，PUBLICHOST 无法正确通告宿主机 IP，导致 PASV 连接超时
+    network_mode: host
+    environment:
+      # PUBLICHOST 不设置，让 pure-ftpd 自动检测宿主机 IP（host 网络模式下自动可用）
+      # 设为 0.0.0.0 会导致部分 FTP 客户端连接失败（客户端会尝试连接 0.0.0.0）
+      FTP_PASSIVE_PORTS: "{{passive_port_start}}:{{passive_port_end}}"
+    volumes:
+      - /www/wwwroot:/home/ftpusers
+      - /www/server/pureftpd/pure-ftpd.conf:/etc/pure-ftpd/pure-ftpd.conf:ro
+      - /www/server/pureftpd/passwd:/etc/pure-ftpd/passwd
+      - /www/server/pureftpd/ssl:/etc/ssl/private
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}

@@ -1,0 +1,22 @@
+services:
+  nginx:
+    image: nginx:{{tag}}
+    container_name: panel_nginx
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - /www/wwwroot:/www/wwwroot
+      - /www/server/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /www/server/nginx/conf.d:/etc/nginx/conf.d
+      - /www/server/nginx/conf/vhost:/etc/nginx/conf/vhost
+      - /www/logs/nginx:/www/logs/nginx
+      - /www/wwwlogs:/www/wwwlogs
+      - /www/server/nginx/ssl:/etc/nginx/ssl
+      - /www/ssl:/www/ssl:ro
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}

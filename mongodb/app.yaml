@@ -1,0 +1,85 @@
+key: mongodb
+name: MongoDB
+category: database
+description: 面向文档的 NoSQL 数据库，灵活的 JSON 数据模型，适合快速迭代和大数据场景
+source: official
+icon: icon.svg
+versions:
+  - display: "8.0"
+    tag: "8.0"
+    image: mongo
+    architectures: [amd64, arm64]
+    is_default: true
+  - display: "7.0"
+    tag: "7.0"
+    image: mongo
+    architectures: [amd64, arm64]
+  - display: "6.0"
+    tag: "6.0"
+    image: mongo
+    architectures: [amd64, arm64]
+  - display: "5.0"
+    tag: "5.0"
+    image: mongo
+    architectures: [amd64, arm64]
+    deprecated: true
+default_version: "8.0"
+architectures: [amd64, arm64]
+service_type: database
+db_type: mongodb
+has_web_ui: false
+health_check_timeout: 60
+
+# 容器内 mongodb 进程以 UID 999 运行；预先 chown 数据/日志目录
+volumes_init:
+  - path: /www/server/mongodb/data
+    uid: 999
+    gid: 999
+    mode: "0750"
+  - path: /www/logs/mongodb
+    uid: 999
+    gid: 999
+
+params:
+  - key: port
+    label: 端口
+    type: number
+    default: 27017
+    required: true
+  - key: root_password
+    label: Root 密码
+    type: password
+    default: ""
+    required: true
+    auto_generate: true
+
+manage:
+  # MongoDB 使用 YAML 格式的 mongod.conf，不支持面板的 INI 配置写入
+  # 如需修改 MongoDB 配置（连接数、缓存大小、慢查询等），请通过"配置文件"tab 直接编辑 mongod.conf
+
+init_files:
+  - path: /www/server/mongodb/mongod.conf
+    file: init/mongod.conf
+
+install_hints:
+  - "数据库管理 → 可以管理 MongoDB 数据库和集合"
+  - "计划任务 → 可以设置数据库自动备份"
+
+install_guide:
+  description: "已自动注册为默认 MongoDB 服务，现在可以在以下模块中使用："
+  features:
+    - "数据库管理 - 管理 MongoDB 数据库和集合"
+    - "计划任务 - 设置数据库自动备份"
+  primary_action:
+    label: "前往数据库管理"
+    route: "/database"
+
+resource_limits:
+  memory_mb: 512
+  cpus: 1.0
+  mem_reserve_mb: 256
+
+tabs:
+  - id: performance
+    label: 性能
+    type: performance

@@ -1,0 +1,114 @@
+key: mongoexpress
+name: Mongo Express
+category: tools
+description: MongoDB 的轻量级 Web 管理界面，支持数据库浏览、文档编辑、集合管理
+source: official
+icon: icon.svg
+versions:
+  - display: "1.0"
+    tag: "1.0.2"
+    image: mongo-express
+    architectures: [amd64, arm64]
+    is_default: true
+  - display: "0.54"
+    tag: "0.54"
+    image: mongo-express
+    architectures: [amd64, arm64]
+    deprecated: true
+default_version: "1.0"
+architectures: [amd64, arm64]
+has_web_ui: true
+health_check_timeout: 30
+dependencies:
+  - mongodb
+
+params:
+  - key: port
+    label: 访问端口
+    type: number
+    default: 8081
+    required: true
+  - key: admin_username
+    label: Web 界面用户名
+    type: text
+    default: admin
+    required: true
+  - key: admin_password
+    label: Web 界面密码
+    type: password
+    default: ""
+    required: true
+    auto_generate: true
+
+compose_vars:
+  - placeholder: "{{me_mongodb_url}}"
+    source: registry_password
+    registry_type: mongodb
+    template: "mongodb://{{username}}:{{password}}@panel_mongodb:27017/?authSource=admin"
+    empty_value: ""  # MongoDB 未安装时不启动连接，避免无认证连接产生日志噪音
+
+manage:
+  - key: ME_CONFIG_OPTIONS_EDITORTHEME
+    label: 编辑器主题
+    type: select
+    description: 文档编辑器的代码高亮主题
+    options:
+      - value: default
+        label: 默认
+      - value: ambiance
+        label: Ambiance（暗色）
+      - value: chaos
+        label: Chaos
+      - value: monokai
+        label: Monokai（推荐暗色）
+    restart_required: true
+    file_path: /www/server/mongoexpress/.env
+    ini_section: ""
+    format: env
+
+  - key: ME_CONFIG_MONGODB_ENABLE_ADMIN
+    label: 启用管理员模式
+    type: switch
+    description: 开启后可以管理所有数据库，关闭则只能管理指定数据库
+    restart_required: true
+    file_path: /www/server/mongoexpress/.env
+    ini_section: ""
+    format: env
+
+  - key: ME_CONFIG_SITE_SESSIONSECRET
+    label: Session 密钥
+    type: password
+    description: 用于加密会话的随机字符串
+    restart_required: true
+    file_path: /www/server/mongoexpress/.env
+    ini_section: ""
+    format: env
+
+install_hints:
+  - "通过浏览器访问 http://服务器IP:端口 进入管理界面"
+  - "使用安装时设置的用户名密码登录"
+
+resource_limits:
+  memory_mb: 128
+  cpus: 0.5
+  mem_reserve_mb: 64
+
+tabs:
+  - id: performance
+    label: 性能
+    type: performance
+
+proxy_spec:
+  port_param: port
+  ws_support: false
+  description: "通过域名访问 Mongo Express，建议配置 HTTPS 保护数据库管理界面"
+
+install_guide:
+  description: "Mongo Express 已安装，可以通过浏览器管理 MongoDB："
+  features:
+    - "数据库浏览 - 查看所有数据库和集合"
+    - "文档编辑 - 增删改查 MongoDB 文档"
+    - "集合管理 - 创建索引、查看统计"
+  primary_action:
+    label: "打开 Mongo Express"
+    route: "/apps"

@@ -1,0 +1,31 @@
+services:
+  postgresql:
+    image: postgres:{{tag}}
+    container_name: panel_postgresql
+    restart: unless-stopped
+    ports:
+      - "{{port}}:5432"
+    environment:
+      POSTGRES_PASSWORD: "{{db_password}}"
+      POSTGRES_USER: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - /www/server/postgresql/data:/var/lib/postgresql/data
+      - /www/server/postgresql/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+      - /www/server/postgresql/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+      - /www/logs/postgresql:/var/log/postgresql
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf -c hba_file=/etc/postgresql/pg_hba.conf
+    networks:
+      - panel_network
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}
+
+networks:
+  panel_network:
+    external: true
+    name: panel_network

@@ -1,0 +1,23 @@
+services:
+  openresty:
+    image: openresty/openresty:{{tag}}
+    container_name: panel_openresty
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - /www/wwwroot:/www/wwwroot
+      - /www/server/openresty/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf:ro
+      - /www/server/openresty/conf.d:/etc/nginx/conf.d
+      - /www/server/openresty/conf/vhost:/etc/nginx/conf/vhost
+      - /www/logs/openresty:/usr/local/openresty/nginx/logs
+      - /www/wwwlogs:/www/wwwlogs
+      - /www/server/openresty/ssl:/etc/nginx/ssl
+      - /www/server/openresty/lua:/usr/local/openresty/lualib/custom
+      - /www/ssl:/www/ssl:ro
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}

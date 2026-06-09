@@ -1,0 +1,28 @@
+services:
+  mysql:
+    image: mysql:{{tag}}
+    container_name: panel_mysql
+    restart: unless-stopped
+    ports:
+      - "{{port}}:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "{{root_password}}"
+      MYSQL_ROOT_HOST: "%"
+    volumes:
+      - /www/server/mysql/data:/var/lib/mysql
+      - /www/server/mysql/my.cnf:/etc/mysql/conf.d/custom.cnf:ro
+      - /www/logs/mysql:/var/log/mysql
+    networks:
+      - panel_network
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}
+
+networks:
+  panel_network:
+    external: true
+    name: panel_network

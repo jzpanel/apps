@@ -1,0 +1,170 @@
+key: nginx
+name: Nginx
+category: runtime
+description: 高性能 HTTP 服务器和反向代理，面板网站管理的核心组件
+source: official
+icon: icon.svg
+versions:
+  - display: "1.27"
+    tag: "1.27-alpine"
+    image: nginx
+    architectures: [amd64, arm64]
+    is_default: true
+  - display: "1.26"
+    tag: "1.26-alpine"
+    image: nginx
+    architectures: [amd64, arm64]
+  - display: "1.25"
+    tag: "1.25-alpine"
+    image: nginx
+    architectures: [amd64, arm64]
+  - display: "1.24"
+    tag: "1.24-alpine"
+    image: nginx
+    architectures: [amd64, arm64]
+default_version: "1.27"
+architectures: [amd64, arm64]
+service_type: webserver
+has_web_ui: false
+health_check_timeout: 30
+
+params:
+  - key: http_port
+    label: HTTP 端口
+    type: number
+    default: 80
+    required: true
+  - key: https_port
+    label: HTTPS 端口
+    type: number
+    default: 443
+    required: true
+
+manage:
+  - key: worker_processes
+    label: Worker 进程数
+    type: select
+    description: auto 表示自动检测 CPU 核心数
+    options:
+      - value: auto
+        label: 自动（推荐）
+      - value: "1"
+        label: "1"
+      - value: "2"
+        label: "2"
+      - value: "4"
+        label: "4"
+      - value: "8"
+        label: "8"
+    restart_required: false
+    file_path: /www/server/nginx/nginx.conf
+    format: kv_space
+    ini_section: ""
+
+  - key: worker_connections
+    label: 每进程最大连接数
+    type: select
+    description: 单个 worker 进程允许的最大并发连接数
+    options:
+      - value: "1024"
+        label: "1024"
+      - value: "2048"
+        label: "2048"
+      - value: "4096"
+        label: "4096（推荐）"
+      - value: "8192"
+        label: "8192"
+      - value: "65535"
+        label: "65535（高并发）"
+    restart_required: false
+    file_path: /www/server/nginx/nginx.conf
+    format: kv_space
+    ini_section: ""
+
+  - key: keepalive_timeout
+    label: Keepalive 超时（秒）
+    type: number
+    description: 客户端连接保持时间，0 表示禁用
+    restart_required: false
+    file_path: /www/server/nginx/nginx.conf
+    format: kv_space
+    ini_section: ""
+
+  - key: client_max_body_size
+    label: 最大请求体大小
+    type: text
+    description: 限制客户端请求体大小，如 10m、100m、0（不限制）
+    restart_required: false
+    file_path: /www/server/nginx/nginx.conf
+    format: kv_space
+    ini_section: ""
+
+  - key: gzip
+    label: Gzip 压缩
+    type: switch
+    description: 开启后自动压缩响应内容，减少带宽消耗
+    bool_format: "on/off"
+    restart_required: false
+    file_path: /www/server/nginx/nginx.conf
+    format: kv_space
+    ini_section: ""
+
+  - key: gzip_comp_level
+    label: Gzip 压缩级别
+    type: select
+    description: 1 最快，9 最高压缩率，推荐 6
+    options:
+      - value: "1"
+        label: "1（最快）"
+      - value: "3"
+        label: "3"
+      - value: "6"
+        label: "6（推荐）"
+      - value: "9"
+        label: "9（最高压缩）"
+    restart_required: false
+    file_path: /www/server/nginx/nginx.conf
+    format: kv_space
+    ini_section: ""
+
+  - key: server_tokens
+    label: 隐藏版本号
+    type: switch
+    description: 关闭后响应头不显示 Nginx 版本，提升安全性
+    bool_format: "on/off"
+    restart_required: false
+    file_path: /www/server/nginx/nginx.conf
+    format: kv_space
+    ini_section: ""
+
+init_files:
+  - path: /www/server/nginx/nginx.conf
+    file: init/nginx.conf
+  - path: /www/server/nginx/conf.d/.keep
+    content: ""
+
+install_hints:
+  - "网站管理 → 可以创建和管理网站、配置反向代理"
+  - "SSL 证书 → 为网站配置 HTTPS"
+  - "管理 → 配置项 可调整全局性能参数"
+
+resource_limits:
+  memory_mb: 128
+  cpus: 0.5
+  mem_reserve_mb: 32
+
+tabs:
+  - id: performance
+    label: 性能
+    type: performance
+
+install_guide:
+  description: "已自动注册为默认 Web 服务器，现在可以开始创建网站："
+  features:
+    - "网站管理 - 创建静态/PHP/反向代理网站"
+    - "反向代理 - 配置应用反向代理规则"
+    - "SSL 证书 - 一键申请 Let's Encrypt 证书"
+    - "性能调优 - 管理页面调整 Worker、Gzip 等参数"
+  primary_action:
+    label: "创建第一个网站"
+    route: "/website"
