@@ -10,9 +10,13 @@ RUN set -eux; \
     printf 'Acquire::Check-Valid-Until "false";\n' > /etc/apt/apt.conf.d/99no-check-valid; \
     apt-get update
 
-# 系统依赖（Debian Jessie 包名）
+# 编译工具链 + 系统依赖（Debian Jessie 包名）
+# docker-php-ext-install 编译扩展需要 gcc/make/autoconf，显式安装 build-essential 与 autoconf 保证可用。
 # 注意：PHP 5.4+ 的 mbstring 自带 bundled oniguruma，无需外部 libonig
 RUN apt-get install -y --no-install-recommends --force-yes \
+        build-essential \
+        autoconf \
+        pkg-config \
         libpng12-dev \
         libjpeg-dev \
         libwebp-dev \
@@ -28,15 +32,16 @@ RUN docker-php-ext-configure gd \
         --with-jpeg-dir=/usr/include/ \
         --with-png-dir=/usr/include/
 
-# 核心扩展逐个安装（拆分便于定位编译失败；这些在 PHP 5.4 上稳定编译）
-RUN docker-php-ext-install -j$(nproc) mysqli
-RUN docker-php-ext-install -j$(nproc) pdo_mysql
-RUN docker-php-ext-install -j$(nproc) gd
-RUN docker-php-ext-install -j$(nproc) mbstring
-RUN docker-php-ext-install -j$(nproc) exif
-RUN docker-php-ext-install -j$(nproc) bcmath
-RUN docker-php-ext-install -j$(nproc) sockets
-RUN docker-php-ext-install -j$(nproc) soap
+# 核心扩展逐个安装（PHP 5.4 镜像自带的 docker-php-ext-install 脚本太老，
+# 不支持 -j 并行参数，传 -j 会被当作未知参数打印 usage 并退出 1，因此这里不能加 -j）
+RUN docker-php-ext-install mysqli
+RUN docker-php-ext-install pdo_mysql
+RUN docker-php-ext-install gd
+RUN docker-php-ext-install mbstring
+RUN docker-php-ext-install exif
+RUN docker-php-ext-install bcmath
+RUN docker-php-ext-install sockets
+RUN docker-php-ext-install soap
 # 注意：intl 在 PHP 5.4 + Debian Jessie 的 ICU 版本组合下编译不稳定，
 # 不在镜像内置；用户如需 intl 可通过面板"扩展管理"按需安装。
 
