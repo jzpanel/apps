@@ -5,7 +5,6 @@ on:
     branches:
       - main
     paths:
-      - 'php_54/Dockerfile'
       - 'php_55/Dockerfile'
       - 'php_56/Dockerfile'
       - 'php_70/Dockerfile'
@@ -34,10 +33,6 @@ jobs:
       fail-fast: false   # 某个版本失败不影响其他版本
       matrix:
         include:
-          - php_version: "5.4"
-            dir: php_54
-            tag: "5.4-fpm"
-            platforms: "linux/amd64"
           - php_version: "5.5"
             dir: php_55
             tag: "5.5-fpm-alpine"

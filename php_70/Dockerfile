@@ -36,9 +36,9 @@ RUN docker-php-ext-install -j$(nproc) \
         pcntl \
         opcache
 
-# PECL 扩展：redis（PHP 7.0 需锁定 redis 5.3.7，新版 redis 扩展要求 PHP>=7.x 且部分要 8.x）
+# PECL 扩展：redis（PHP 7.0 锁定 redis 3.1.6，redis 5.x/6.x 要求 PHP>=7.2）
 RUN apk add --no-cache --virtual .pecl-deps $PHPIZE_DEPS \
-    && pecl install redis-5.3.7 \
+    && pecl install redis-3.1.6 \
     && docker-php-ext-enable redis \
     && apk del .pecl-deps \
     && rm -rf /tmp/pear
