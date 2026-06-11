@@ -1,5 +1,5 @@
 {
-  "version": "1.0.6",
-  "updated_at": "2026-06-11T01:21:37Z",
-  "changelog": "本次更新涉及 4 个应用：php_54, php_55, php_56, php_70。详见 git log。"
+  "version": "1.0.7",
+  "updated_at": "2026-06-11T02:14:01Z",
+  "changelog": "本次更新涉及 1 个应用：php_54。详见 git log。"
 }
