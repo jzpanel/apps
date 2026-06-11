@@ -123,22 +123,37 @@ jobs:
             docker://${{ matrix.base_image }}
           echo "已转换 ${{ matrix.base_convert }} → ${{ matrix.base_image }}（schema2）"
 
-      - name: Build and push PHP ${{ matrix.php_version }}
-        if: steps.should_build.outputs.build == 'true'
+      - name: Build and push PHP ${{ matrix.php_version }} (buildx, multi-arch / list-manifest bases)
+        if: steps.should_build.outputs.build == 'true' && matrix.base_convert == ''
         uses: docker/build-push-action@v5
         with:
           context: ./${{ matrix.dir }}
           file: ./${{ matrix.dir }}/Dockerfile
           platforms: ${{ matrix.platforms }}
           push: true
-          # 强制重新拉取基础镜像、不使用任何构建缓存。
-          # 老版本镜像（5.5 等）曾出现 buildx 缓存记录的旧 digest 在 Docker Hub 已失效，
-          # 导致 "content digest : not found"；no-cache + pull 可彻底规避。
           no-cache: true
           pull: true
           tags: |
             ${{ env.IMAGE_NAME }}:${{ matrix.tag }}
             ${{ env.IMAGE_NAME }}:${{ matrix.php_version }}
+
+      # 老版本（5.4/5.5）的基底经 skopeo 转成单架构 schema2，buildx/buildkit 解析其
+      # content-addressable digest 时会报 "content digest : not found"（buildkit 对单 manifest
+      # 镜像的已知问题）。这些版本改用经典 builder（DOCKER_BUILDKIT=0 docker build），
+      # 经典 builder 用传统镜像拉取逻辑，不走 buildkit content store，可正常 FROM 这类镜像。
+      # 经典 builder 只支持单架构，正好这些老版本仅 linux/amd64。
+      - name: Build and push PHP ${{ matrix.php_version }} (legacy builder, converted bases)
+        if: steps.should_build.outputs.build == 'true' && matrix.base_convert != ''
+        env:
+          DOCKER_BUILDKIT: "0"
+        run: |
+          docker build --pull --no-cache \
+            -t "${{ env.IMAGE_NAME }}:${{ matrix.tag }}" \
+            -t "${{ env.IMAGE_NAME }}:${{ matrix.php_version }}" \
+            -f "./${{ matrix.dir }}/Dockerfile" \
+            "./${{ matrix.dir }}"
+          docker push "${{ env.IMAGE_NAME }}:${{ matrix.tag }}"
+          docker push "${{ env.IMAGE_NAME }}:${{ matrix.php_version }}"
 
       - name: Image digest
         if: steps.should_build.outputs.build == 'true'
