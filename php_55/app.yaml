@@ -6,7 +6,7 @@ source: official
 icon: icon.svg
 versions:
   - display: "5.5"
-    tag: "5.5-fpm-alpine"
+    tag: "5.5-fpm"
     image: jzpanel/php
     architectures: [amd64]
     is_default: true

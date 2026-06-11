@@ -42,10 +42,10 @@ jobs:
             base_image: "jzpanel/php:5.4-fpm-base"
           - php_version: "5.5"
             dir: php_55
-            tag: "5.5-fpm-alpine"
+            tag: "5.5-fpm"
             platforms: "linux/amd64"
-            base_convert: "php:5.5-fpm-alpine"
-            base_image: "jzpanel/php:5.5-fpm-alpine-base"
+            base_convert: "php:5.5-fpm"
+            base_image: "jzpanel/php:5.5-fpm-base"
           - php_version: "5.6"
             dir: php_56
             tag: "5.6-fpm-alpine"
