@@ -5,6 +5,7 @@ on:
     branches:
       - main
     paths:
+      - 'php_54/Dockerfile'
       - 'php_55/Dockerfile'
       - 'php_56/Dockerfile'
       - 'php_70/Dockerfile'
@@ -33,6 +34,12 @@ jobs:
       fail-fast: false   # 某个版本失败不影响其他版本
       matrix:
         include:
+          - php_version: "5.4"
+            dir: php_54
+            tag: "5.4-fpm"
+            platforms: "linux/amd64"
+            base_convert: "php:5.4-fpm"
+            base_image: "jzpanel/php:5.4-fpm-base"
           - php_version: "5.5"
             dir: php_55
             tag: "5.5-fpm-alpine"
@@ -98,6 +105,21 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # 老版本（如 PHP 5.4）官方镜像是已废弃的 Docker schema 1 manifest，
+      # BuildKit 拒绝以它为 FROM 基底。用 skopeo 无损转换为 schema 2 并推到我们自己的
+      # 命名空间（jzpanel/php:<ver>-fpm-base），Dockerfile 再 FROM 这个转好的基底。
+      # 仅当 matrix.base_convert 非空时执行（目前只有 5.4 需要）。
+      - name: Convert legacy schema1 base image to schema2 (skopeo)
+        if: steps.should_build.outputs.build == 'true' && matrix.base_convert != ''
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y skopeo
+          skopeo copy --format v2s2 --all=false \
+            --dest-creds "${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }}" \
+            docker://${{ matrix.base_convert }} \
+            docker://${{ matrix.base_image }}
+          echo "已转换 ${{ matrix.base_convert }} → ${{ matrix.base_image }}（schema2）"
 
       - name: Build and push PHP ${{ matrix.php_version }}
         if: steps.should_build.outputs.build == 'true'
