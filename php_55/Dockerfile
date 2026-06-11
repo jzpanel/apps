@@ -1,4 +1,7 @@
-FROM php:5.5-fpm-alpine
+# php:5.5-fpm-alpine 在 Docker Hub 上的当前 manifest 存在 content blob 拉取问题
+# （buildx 报 "content digest : not found"，no-cache 无效）。CI 用 skopeo 把它无损复制到
+# jzpanel/php:5.5-fpm-alpine-base，FROM 我们自己的副本绕开该问题（见 workflow 的 skopeo 步骤）。
+FROM jzpanel/php:5.5-fpm-alpine-base
 
 # 系统依赖（编译各扩展所需的库）
 RUN apk add --no-cache \
