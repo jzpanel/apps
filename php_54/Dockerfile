@@ -50,18 +50,9 @@ RUN pecl install redis-2.2.8 \
     && docker-php-ext-enable redis \
     && rm -rf /tmp/pear
 
-# opcache：PHP 5.4 无内置 opcache，使用 PECL zendopcache 1.3.2
-RUN pecl install zendopcache-1.3.2 \
-    && echo 'zend_extension=opcache.so' > /usr/local/etc/php/conf.d/00-opcache.ini \
-    && { \
-        echo 'opcache.enable=1'; \
-        echo 'opcache.memory_consumption=128'; \
-        echo 'opcache.interned_strings_buffer=8'; \
-        echo 'opcache.max_accelerated_files=10000'; \
-        echo 'opcache.revalidate_freq=60'; \
-        echo 'opcache.fast_shutdown=1'; \
-    } >> /usr/local/etc/php/conf.d/00-opcache.ini \
-    && rm -rf /tmp/pear
+# 说明：PHP 5.4 不内置 opcache，且 PECL 上的旧版 zendopcache（1.x）已下架无法下载，
+# 新版 zendopcache(7.x) 不兼容 5.4。PHP 5.4 仅作老站点兼容用途，不提供 opcache 字节码缓存。
+# 用户如确需，可自行在容器内编译，但不建议（5.4 已 EOL 多年）。
 
 # 注意：实际监听端口由宿主机挂载的 php-fpm.conf 中 listen 字段决定（php_54=9054）
 CMD ["php-fpm"]

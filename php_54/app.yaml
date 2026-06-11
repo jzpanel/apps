@@ -126,29 +126,6 @@ manage:
     file_path: /www/server/php_54/php.ini
     ini_section: PHP
 
-  - key: opcache.enable
-    label: 启用 OPcache
-    type: switch
-    description: 字节码缓存，强烈推荐开启
-    bool_format: "1/0"
-    restart_required: true
-    file_path: /www/server/php_54/php.ini
-    ini_section: opcache
-
-  - key: opcache.memory_consumption
-    label: OPcache 内存大小（MB）
-    type: select
-    options:
-      - value: "64"
-        label: 64MB
-      - value: "128"
-        label: 128MB（推荐）
-      - value: "256"
-        label: 256MB
-    restart_required: true
-    file_path: /www/server/php_54/php.ini
-    ini_section: opcache
-
   - key: pm
     label: 进程管理方式
     type: select
