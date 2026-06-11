@@ -1,0 +1,34 @@
+key: node_18
+name: Node.js 18
+description: Node.js 18 运行环境（容器化，供 Node 网站使用，无需在宿主机安装）
+category: runtime
+source: official
+icon: icon.svg
+runtime_type: node
+versions:
+  - display: "18"
+    tag: "18-alpine"
+    image: jzpanel/node
+    architectures: [amd64, arm64]
+    is_default: true
+default_version: "18"
+architectures: [amd64, arm64]
+service_type: node
+has_web_ui: false
+health_check_timeout: 30
+params: []
+init_files: []
+
+install_hints:
+  - "Node.js 18 运行环境已就绪，可在「网站」创建 Node 项目时选择此版本"
+  - "每个 Node 网站作为容器内独立进程运行，由面板自动管理启停"
+
+resource_limits:
+  memory_mb: 1024
+  cpus: 2.0
+  mem_reserve_mb: 256
+
+tabs:
+  - id: performance
+    label: 性能
+    type: performance

@@ -1,0 +1,34 @@
+key: go_122
+name: Go 1.22
+description: Go 1.22 运行环境（容器化，供 Go 网站使用，含完整工具链，无需在宿主机安装）
+category: runtime
+source: official
+icon: icon.svg
+runtime_type: go
+versions:
+  - display: "1.22"
+    tag: "1.22-alpine"
+    image: jzpanel/go
+    architectures: [amd64, arm64]
+    is_default: true
+default_version: "1.22"
+architectures: [amd64, arm64]
+service_type: go
+has_web_ui: false
+health_check_timeout: 30
+params: []
+init_files: []
+
+install_hints:
+  - "Go 1.22 运行环境已就绪，可在「网站」创建 Go 项目时选择此版本"
+  - "启动命令可填 './your-binary'（推荐，先编译）或 'go run .'（开发）"
+
+resource_limits:
+  memory_mb: 1024
+  cpus: 2.0
+  mem_reserve_mb: 256
+
+tabs:
+  - id: performance
+    label: 性能
+    type: performance

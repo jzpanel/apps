@@ -1,0 +1,39 @@
+key: node_20
+name: Node.js 20
+category: runtime
+description: Node.js 20 运行环境（容器化，供 Node 网站使用，无需在宿主机安装）
+source: official
+icon: icon.svg
+runtime_type: node
+versions:
+  - display: "20"
+    tag: "20-alpine"
+    image: jzpanel/node
+    architectures: [amd64, arm64]
+    is_default: true
+default_version: "20"
+architectures: [amd64, arm64]
+service_type: node
+has_web_ui: false
+health_check_timeout: 30
+
+# 端口由各 Node 网站分配（容器内 supervisor 管理进程），不通过安装参数控制
+params: []
+
+# 容器内通过挂载的 supervisor conf.d 管理各网站进程；
+# 面板创建 Node 网站时写入 /www/server/node_20/supervisor/website_<id>.conf
+init_files: []
+
+install_hints:
+  - "Node.js 20 运行环境已就绪，可在「网站」创建 Node 项目时选择此版本"
+  - "每个 Node 网站作为容器内独立进程运行，由面板自动管理启停"
+
+resource_limits:
+  memory_mb: 1024
+  cpus: 2.0
+  mem_reserve_mb: 256
+
+tabs:
+  - id: performance
+    label: 性能
+    type: performance

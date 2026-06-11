@@ -1,7 +1,7 @@
 key: php_55
 name: PHP 5.5
 category: runtime
-description: PHP 5.5 FPM 运行环境，适配老旧 PHP 网站（已 EOL，仅兼容用途）
+description: PHP 5.5 FPM 运行环境，适配老旧 PHP 网站
 source: official
 icon: icon.svg
 versions:

@@ -1,7 +1,7 @@
 key: php_70
 name: PHP 7.0
 category: runtime
-description: PHP 7.0 FPM 运行环境，适配老旧 PHP 网站（已 EOL，仅兼容用途）
+description: PHP 7.0 FPM 运行环境，适配老旧 PHP 网站
 source: official
 icon: icon.svg
 versions:

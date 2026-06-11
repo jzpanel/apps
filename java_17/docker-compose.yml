@@ -1,0 +1,17 @@
+services:
+  java:
+    image: jzpanel/java:{{tag}}
+    container_name: panel_java_17
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - /www/wwwroot:/www/wwwroot
+      - /www/server/java_17/supervisor:/etc/supervisor/conf.d
+      - /www/logs/java_17:/var/log/supervisor
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}

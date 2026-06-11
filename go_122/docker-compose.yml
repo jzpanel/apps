@@ -1,0 +1,18 @@
+services:
+  go:
+    image: jzpanel/go:{{tag}}
+    container_name: panel_go_122
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - /www/wwwroot:/www/wwwroot
+      - /www/server/go_122/supervisor:/etc/supervisor/conf.d
+      - /www/server/go_122/gocache:/go/pkg/mod
+      - /www/logs/go_122:/var/log/supervisor
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}

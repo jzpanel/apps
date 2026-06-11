@@ -1,0 +1,103 @@
+name: Build & Push Runtime Images
+
+# 构建 Node/Go/Java 等运行环境共享容器镜像（官方基础镜像 + supervisor）。
+# 推送到 jzpanel/node、jzpanel/go、jzpanel/java。
+# 这些官方基础镜像都是 manifest-list（多架构），统一走 buildx 多架构构建。
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'node_20/Dockerfile'
+      - 'node_18/Dockerfile'
+      - 'go_122/Dockerfile'
+      - 'java_17/Dockerfile'
+      - 'node_20/init/**'
+      - 'node_18/init/**'
+      - 'go_122/init/**'
+      - 'java_17/init/**'
+      - '.github/workflows/build-runtime.yml'
+  workflow_dispatch:
+    inputs:
+      keys:
+        description: '要构建的运行时 key（逗号分隔，如 node_20,go_122 或 all）'
+        required: false
+        default: 'all'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - key: node_20
+            dir: node_20
+            image: jzpanel/node
+            tag: "20-alpine"
+            platforms: "linux/amd64,linux/arm64"
+          - key: node_18
+            dir: node_18
+            image: jzpanel/node
+            tag: "18-alpine"
+            platforms: "linux/amd64,linux/arm64"
+          - key: go_122
+            dir: go_122
+            image: jzpanel/go
+            tag: "1.22-alpine"
+            platforms: "linux/amd64,linux/arm64"
+          - key: java_17
+            dir: java_17
+            image: jzpanel/java
+            tag: "17-jdk"
+            platforms: "linux/amd64,linux/arm64"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check if this runtime should build
+        id: should_build
+        run: |
+          INPUT="${{ github.event.inputs.keys }}"
+          if [ -z "$INPUT" ] || [ "$INPUT" = "all" ]; then
+            echo "build=true" >> $GITHUB_OUTPUT
+          elif echo "$INPUT" | grep -qw "${{ matrix.key }}"; then
+            echo "build=true" >> $GITHUB_OUTPUT
+          else
+            echo "build=false" >> $GITHUB_OUTPUT
+            echo "Skipping ${{ matrix.key }}"
+          fi
+
+      - name: Set up QEMU (multi-arch)
+        if: steps.should_build.outputs.build == 'true'
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        if: steps.should_build.outputs.build == 'true'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        if: steps.should_build.outputs.build == 'true'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push ${{ matrix.key }}
+        if: steps.should_build.outputs.build == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: ./${{ matrix.dir }}
+          file: ./${{ matrix.dir }}/Dockerfile
+          platforms: ${{ matrix.platforms }}
+          push: true
+          no-cache: true
+          pull: true
+          tags: |
+            ${{ matrix.image }}:${{ matrix.tag }}
+
+      - name: Image digest
+        if: steps.should_build.outputs.build == 'true'
+        run: echo "${{ matrix.key }} (${{ matrix.image }}:${{ matrix.tag }}) pushed successfully"
