@@ -129,6 +129,11 @@ jobs:
           file: ./${{ matrix.dir }}/Dockerfile
           platforms: ${{ matrix.platforms }}
           push: true
+          # 强制重新拉取基础镜像、不使用任何构建缓存。
+          # 老版本镜像（5.5 等）曾出现 buildx 缓存记录的旧 digest 在 Docker Hub 已失效，
+          # 导致 "content digest : not found"；no-cache + pull 可彻底规避。
+          no-cache: true
+          pull: true
           tags: |
             ${{ env.IMAGE_NAME }}:${{ matrix.tag }}
             ${{ env.IMAGE_NAME }}:${{ matrix.php_version }}
