@@ -11,12 +11,12 @@ RUN set -eux; \
     apt-get update
 
 # 系统依赖（Debian Jessie 包名）
+# 注意：PHP 5.4+ 的 mbstring 自带 bundled oniguruma，无需外部 libonig
 RUN apt-get install -y --no-install-recommends --force-yes \
         libpng12-dev \
         libjpeg-dev \
         libwebp-dev \
         libfreetype6-dev \
-        libicu-dev \
         libxml2-dev \
         libcurl4-openssl-dev \
     && rm -rf /var/lib/apt/lists/*
@@ -28,18 +28,17 @@ RUN docker-php-ext-configure gd \
         --with-jpeg-dir=/usr/include/ \
         --with-png-dir=/usr/include/
 
-# 内置扩展（PHP 5.4 无内置 opcache，用 PECL zendopcache）
-RUN docker-php-ext-install -j$(nproc) \
-        mysqli \
-        pdo_mysql \
-        gd \
-        intl \
-        soap \
-        sockets \
-        exif \
-        bcmath \
-        pcntl \
-        mbstring
+# 核心扩展逐个安装（拆分便于定位编译失败；这些在 PHP 5.4 上稳定编译）
+RUN docker-php-ext-install -j$(nproc) mysqli
+RUN docker-php-ext-install -j$(nproc) pdo_mysql
+RUN docker-php-ext-install -j$(nproc) gd
+RUN docker-php-ext-install -j$(nproc) mbstring
+RUN docker-php-ext-install -j$(nproc) exif
+RUN docker-php-ext-install -j$(nproc) bcmath
+RUN docker-php-ext-install -j$(nproc) sockets
+RUN docker-php-ext-install -j$(nproc) soap
+# 注意：intl 在 PHP 5.4 + Debian Jessie 的 ICU 版本组合下编译不稳定，
+# 不在镜像内置；用户如需 intl 可通过面板"扩展管理"按需安装。
 
 # PECL 扩展：redis（PHP 5.4 锁定 redis 2.2.8，4.x/5.x 在 5.4 上编译失败）
 RUN pecl install redis-2.2.8 \

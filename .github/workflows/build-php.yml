@@ -132,9 +132,6 @@ jobs:
           tags: |
             ${{ env.IMAGE_NAME }}:${{ matrix.tag }}
             ${{ env.IMAGE_NAME }}:${{ matrix.php_version }}
-          # 使用 GitHub Actions 缓存加速重复构建
-          cache-from: type=gha,scope=php-${{ matrix.php_version }}
-          cache-to: type=gha,mode=max,scope=php-${{ matrix.php_version }}
 
       - name: Image digest
         if: steps.should_build.outputs.build == 'true'
