@@ -1,0 +1,242 @@
+key: php_54
+name: PHP 5.4
+category: runtime
+description: PHP 5.4 FPM 运行环境，适配老旧 PHP 网站（已 EOL，仅兼容用途）
+source: official
+icon: icon.svg
+versions:
+  - display: "5.4"
+    tag: "5.4-fpm"
+    image: jzpanel/php
+    architectures: [amd64]
+    is_default: true
+    deprecated: true
+default_version: "5.4"
+architectures: [amd64]
+service_type: php
+has_web_ui: false
+health_check_timeout: 30
+
+# host 网络模式下监听端口由 php-fpm.conf 的 listen 字段决定（固定为 9054）
+params: []
+
+manage:
+  - key: memory_limit
+    label: 内存限制
+    type: select
+    description: 每个 PHP 进程可使用的最大内存
+    options:
+      - value: 64M
+        label: 64M
+      - value: 128M
+        label: 128M（默认）
+      - value: 256M
+        label: 256M（推荐）
+      - value: 512M
+        label: 512M
+      - value: 1024M
+        label: 1024M
+      - value: -1
+        label: 不限制
+    restart_required: true
+    file_path: /www/server/php_54/php.ini
+    ini_section: PHP
+
+  - key: upload_max_filesize
+    label: 最大上传文件大小
+    type: select
+    options:
+      - value: 2M
+        label: 2M
+      - value: 10M
+        label: 10M
+      - value: 32M
+        label: 32M
+      - value: 64M
+        label: 64M（推荐）
+      - value: 128M
+        label: 128M
+      - value: 256M
+        label: 256M
+    restart_required: true
+    file_path: /www/server/php_54/php.ini
+    ini_section: PHP
+
+  - key: post_max_size
+    label: POST 数据最大大小
+    type: select
+    options:
+      - value: 8M
+        label: 8M
+      - value: 32M
+        label: 32M
+      - value: 64M
+        label: 64M
+      - value: 128M
+        label: 128M（推荐）
+      - value: 256M
+        label: 256M
+    restart_required: true
+    file_path: /www/server/php_54/php.ini
+    ini_section: PHP
+
+  - key: max_execution_time
+    label: 最大执行时间（秒）
+    type: number
+    description: PHP 脚本最大执行时间，0 表示不限制
+    restart_required: true
+    file_path: /www/server/php_54/php.ini
+    ini_section: PHP
+
+  - key: max_input_vars
+    label: 最大输入变量数
+    type: number
+    restart_required: true
+    file_path: /www/server/php_54/php.ini
+    ini_section: PHP
+
+  - key: date.timezone
+    label: 时区
+    type: select
+    options:
+      - value: Asia/Shanghai
+        label: Asia/Shanghai（推荐）
+      - value: Asia/Hong_Kong
+        label: Asia/Hong_Kong
+      - value: UTC
+        label: UTC
+    restart_required: true
+    file_path: /www/server/php_54/php.ini
+    ini_section: PHP
+
+  - key: display_errors
+    label: 显示错误信息
+    type: switch
+    description: 生产环境建议关闭
+    bool_format: "On/Off"
+    restart_required: true
+    file_path: /www/server/php_54/php.ini
+    ini_section: PHP
+
+  - key: disable_functions
+    label: 禁用函数
+    type: text
+    description: "逗号分隔，如: exec,passthru,shell_exec，留空不禁用"
+    restart_required: true
+    file_path: /www/server/php_54/php.ini
+    ini_section: PHP
+
+  - key: opcache.enable
+    label: 启用 OPcache
+    type: switch
+    description: 字节码缓存，强烈推荐开启
+    bool_format: "1/0"
+    restart_required: true
+    file_path: /www/server/php_54/php.ini
+    ini_section: opcache
+
+  - key: opcache.memory_consumption
+    label: OPcache 内存大小（MB）
+    type: select
+    options:
+      - value: "64"
+        label: 64MB
+      - value: "128"
+        label: 128MB（推荐）
+      - value: "256"
+        label: 256MB
+    restart_required: true
+    file_path: /www/server/php_54/php.ini
+    ini_section: opcache
+
+  - key: pm
+    label: 进程管理方式
+    type: select
+    options:
+      - value: dynamic
+        label: dynamic（动态，推荐）
+      - value: static
+        label: static（固定）
+      - value: ondemand
+        label: ondemand（按需）
+    restart_required: true
+    file_path: /www/server/php_54/php-fpm.conf
+    ini_section: www
+
+  - key: pm.max_children
+    label: 最大子进程数
+    type: number
+    description: 根据内存调整，每进程约 30-50MB
+    restart_required: true
+    file_path: /www/server/php_54/php-fpm.conf
+    ini_section: www
+
+  - key: pm.max_requests
+    label: 每进程最大请求数
+    type: number
+    description: 防止内存泄漏，0=不限制
+    restart_required: true
+    file_path: /www/server/php_54/php-fpm.conf
+    ini_section: www
+
+extensions:
+  - name: mysqli
+    label: MySQLi
+    installer: ipe
+  - name: pdo_mysql
+    label: PDO MySQL
+    installer: ipe
+  - name: redis
+    label: Redis
+    installer: ipe
+  - name: gd
+    label: GD 图像处理
+    installer: ipe
+  - name: exif
+    label: EXIF 图片元数据
+    installer: ipe
+  - name: mbstring
+    label: 多字节字符串
+    installer: ipe
+  - name: curl
+    label: cURL
+    installer: ipe
+  - name: soap
+    label: SOAP
+    installer: ipe
+  - name: sockets
+    label: Sockets
+    installer: ipe
+  - name: fileinfo
+    label: 文件信息检测
+    installer: ipe
+  - name: ioncube
+    label: ionCube Loader（运行加密源码）
+    installer: shell
+    command: "PHP_VER=$(php -r 'echo PHP_MAJOR_VERSION.\".\".PHP_MINOR_VERSION;') && curl -fsSL https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz -o /tmp/ioncube.tar.gz && tar -xzf /tmp/ioncube.tar.gz -C /tmp && cp /tmp/ioncube/ioncube_loader_lin_${PHP_VER}.so $(php-config --extension-dir)/ && echo \"zend_extension=ioncube_loader_lin_${PHP_VER}.so\" > /usr/local/etc/php/conf.d/00-ioncube.ini && rm -rf /tmp/ioncube /tmp/ioncube.tar.gz"
+  - name: bcmath
+    label: BCMath 高精度数学
+    installer: ipe
+  - name: pcntl
+    label: 进程控制
+    installer: ipe
+
+init_files:
+  - path: /www/server/php_54/php.ini
+    file: init/php.ini
+  - path: /www/server/php_54/php-fpm.conf
+    file: init/php-fpm.conf
+
+install_hints:
+  - "PHP 5.4 已安装，内置 mysqli/pdo_mysql/gd/redis 等常用扩展，开箱即用"
+  - "PHP 5.4 已停止官方维护（EOL）且基于已归档的 Debian Jessie，仅建议用于运行老旧站点，新项目请使用 PHP 8.x"
+
+resource_limits:
+  memory_mb: 512
+  cpus: 1.0
+  mem_reserve_mb: 128
+
+tabs:
+  - id: performance
+    label: 性能
+    type: performance

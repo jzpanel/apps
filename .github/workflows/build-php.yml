@@ -5,6 +5,10 @@ on:
     branches:
       - main
     paths:
+      - 'php_54/Dockerfile'
+      - 'php_55/Dockerfile'
+      - 'php_56/Dockerfile'
+      - 'php_70/Dockerfile'
       - 'php_74/Dockerfile'
       - 'php_80/Dockerfile'
       - 'php_81/Dockerfile'
@@ -30,21 +34,42 @@ jobs:
       fail-fast: false   # 某个版本失败不影响其他版本
       matrix:
         include:
+          - php_version: "5.4"
+            dir: php_54
+            tag: "5.4-fpm"
+            platforms: "linux/amd64"
+          - php_version: "5.5"
+            dir: php_55
+            tag: "5.5-fpm-alpine"
+            platforms: "linux/amd64"
+          - php_version: "5.6"
+            dir: php_56
+            tag: "5.6-fpm-alpine"
+            platforms: "linux/amd64"
+          - php_version: "7.0"
+            dir: php_70
+            tag: "7.0-fpm-alpine"
+            platforms: "linux/amd64"
           - php_version: "7.4"
             dir: php_74
             tag: "7.4-fpm-alpine"
+            platforms: "linux/amd64,linux/arm64"
           - php_version: "8.0"
             dir: php_80
             tag: "8.0-fpm-alpine"
+            platforms: "linux/amd64,linux/arm64"
           - php_version: "8.1"
             dir: php_81
             tag: "8.1-fpm-alpine"
+            platforms: "linux/amd64,linux/arm64"
           - php_version: "8.2"
             dir: php_82
             tag: "8.2-fpm-alpine"
+            platforms: "linux/amd64,linux/arm64"
           - php_version: "8.3"
             dir: php_83
             tag: "8.3-fpm-alpine"
+            platforms: "linux/amd64,linux/arm64"
 
     steps:
       - name: Checkout
@@ -85,7 +110,7 @@ jobs:
         with:
           context: ./${{ matrix.dir }}
           file: ./${{ matrix.dir }}/Dockerfile
-          platforms: linux/amd64,linux/arm64
+          platforms: ${{ matrix.platforms }}
           push: true
           tags: |
             ${{ env.IMAGE_NAME }}:${{ matrix.tag }}
