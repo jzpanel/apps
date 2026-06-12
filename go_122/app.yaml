@@ -19,6 +19,13 @@ health_check_timeout: 30
 params: []
 init_files: []
 
+# 预创建挂载目录（supervisor 配置 + go module 缓存）
+volumes_init:
+  - path: /www/server/go_122/supervisor
+    mode: "0755"
+  - path: /www/server/go_122/gocache
+    mode: "0777"
+
 install_hints:
   - "Go 1.22 运行环境已就绪，可在「网站」创建 Go 项目时选择此版本"
   - "启动命令可填 './your-binary'（推荐，先编译）或 'go run .'（开发）"

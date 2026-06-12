@@ -9,6 +9,7 @@ services:
       - /www/server/go_122/supervisor:/etc/supervisor/conf.d
       - /www/server/go_122/gocache:/go/pkg/mod
       - /www/logs/go_122:/var/log/supervisor
+      - /www/wwwlogs:/www/wwwlogs
     deploy:
       resources:
         limits:

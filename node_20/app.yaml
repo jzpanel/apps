@@ -24,6 +24,11 @@ params: []
 # 面板创建 Node 网站时写入 /www/server/node_20/supervisor/website_<id>.conf
 init_files: []
 
+# 预创建挂载目录（面板写 supervisor 配置 + 容器内 supervisord 是 root，0755 即可）
+volumes_init:
+  - path: /www/server/node_20/supervisor
+    mode: "0755"
+
 install_hints:
   - "Node.js 20 运行环境已就绪，可在「网站」创建 Node 项目时选择此版本"
   - "每个 Node 网站作为容器内独立进程运行，由面板自动管理启停"

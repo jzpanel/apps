@@ -8,6 +8,7 @@ services:
       - /www/wwwroot:/www/wwwroot
       - /www/server/node_18/supervisor:/etc/supervisor/conf.d
       - /www/logs/node_18:/var/log/supervisor
+      - /www/wwwlogs:/www/wwwlogs
     deploy:
       resources:
         limits:

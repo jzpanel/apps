@@ -19,6 +19,11 @@ health_check_timeout: 30
 params: []
 init_files: []
 
+# 预创建挂载目录（面板写 supervisor 配置）
+volumes_init:
+  - path: /www/server/java_17/supervisor
+    mode: "0755"
+
 install_hints:
   - "Java 17 运行环境已就绪，可在「网站」创建 Java 项目时选择此版本"
   - "启动命令通常为 'java -jar your-app.jar'，每个网站为独立 JVM 进程"

@@ -19,6 +19,11 @@ health_check_timeout: 30
 params: []
 init_files: []
 
+# 预创建挂载目录（面板写 supervisor 配置）
+volumes_init:
+  - path: /www/server/node_18/supervisor
+    mode: "0755"
+
 install_hints:
   - "Node.js 18 运行环境已就绪，可在「网站」创建 Node 项目时选择此版本"
   - "每个 Node 网站作为容器内独立进程运行，由面板自动管理启停"

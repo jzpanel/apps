@@ -8,6 +8,7 @@ services:
       - /www/wwwroot:/www/wwwroot
       - /www/server/java_17/supervisor:/etc/supervisor/conf.d
       - /www/logs/java_17:/var/log/supervisor
+      - /www/wwwlogs:/www/wwwlogs
     deploy:
       resources:
         limits:
