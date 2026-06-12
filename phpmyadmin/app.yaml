@@ -30,11 +30,10 @@ params:
     required: true
 
 compose_vars:
-  - placeholder: "{{pma_host}}"
-    source: registry_password
+  - placeholder: "{{pma_hosts}}"
+    source: db_instance_hosts
     registry_type: mysql
-    template: "panel_mysql"
-    empty_value: "panel_mysql"
+    empty_value: "panel_mysql_80"
 
 manage: []
 
