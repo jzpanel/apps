@@ -1,5 +1,5 @@
 {
-  "version": "1.0.17",
-  "updated_at": "2026-06-12T11:09:13Z",
-  "changelog": "本次更新涉及 3 个应用：minio, rabbitmq, redisinsight。详见 git log。"
+  "version": "1.0.18",
+  "updated_at": "2026-06-12T12:17:54Z",
+  "changelog": "本次更新涉及 3 个应用：mongoexpress, pgweb, phpmyadmin。详见 git log。"
 }
