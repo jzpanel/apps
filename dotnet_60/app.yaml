@@ -1,0 +1,40 @@
+key: dotnet_60
+name: .NET 6.0
+description: .NET 6.0 运行环境（容器化，含完整 SDK，上一代 LTS，无需在宿主机安装）
+category: runtime
+source: official
+icon: icon.svg
+runtime_type: dotnet
+versions:
+  - display: "6.0"
+    tag: "6.0-sdk"
+    image: jzpanel/dotnet
+    architectures: [amd64, arm64]
+    is_default: true
+default_version: "6.0"
+architectures: [amd64, arm64]
+service_type: dotnet
+has_web_ui: false
+health_check_timeout: 30
+params: []
+init_files: []
+
+# 预创建挂载目录（面板写 supervisor 配置）
+volumes_init:
+  - path: /www/server/dotnet_60/supervisor
+    mode: "0755"
+
+install_hints:
+  - ".NET 6.0 运行环境已就绪，可在「网站」创建 .NET 项目时选择此版本"
+  - ".NET 6.0 是上一代 LTS，大量企业项目在用"
+  - "启动命令示例：dotnet YourApp.dll（监听端口用 ASPNETCORE_URLS=http://0.0.0.0:$PORT 环境变量控制）"
+
+resource_limits:
+  memory_mb: 1024
+  cpus: 2.0
+  mem_reserve_mb: 256
+
+tabs:
+  - id: performance
+    label: 性能
+    type: performance

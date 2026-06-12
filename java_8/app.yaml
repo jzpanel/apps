@@ -1,0 +1,40 @@
+key: java_8
+name: Java 8
+description: Java 8 运行环境（容器化，Eclipse Temurin JDK，适配老旧 Java 项目，无需在宿主机安装）
+category: runtime
+source: official
+icon: icon.svg
+runtime_type: java
+versions:
+  - display: "8"
+    tag: "8-jdk"
+    image: jzpanel/java
+    architectures: [amd64, arm64]
+    is_default: true
+default_version: "8"
+architectures: [amd64, arm64]
+service_type: java
+has_web_ui: false
+health_check_timeout: 30
+params: []
+init_files: []
+
+# 预创建挂载目录（面板写 supervisor 配置）
+volumes_init:
+  - path: /www/server/java_8/supervisor
+    mode: "0755"
+
+install_hints:
+  - "Java 8 运行环境已就绪，可在「网站」创建 Java 项目时选择此版本"
+  - "Java 8 是企业存量最大的 LTS 版本，适合运行老旧 Spring/Web 项目"
+  - "启动命令通常为 'java -jar your-app.jar'，每个网站为独立 JVM 进程"
+
+resource_limits:
+  memory_mb: 2048
+  cpus: 2.0
+  mem_reserve_mb: 512
+
+tabs:
+  - id: performance
+    label: 性能
+    type: performance

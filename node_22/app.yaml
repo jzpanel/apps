@@ -1,0 +1,40 @@
+key: node_22
+name: Node.js 22
+category: runtime
+description: Node.js 22 运行环境（容器化，最新 LTS，供 Node 网站使用，无需在宿主机安装）
+source: official
+icon: icon.svg
+runtime_type: node
+versions:
+  - display: "22"
+    tag: "22-alpine"
+    image: jzpanel/node
+    architectures: [amd64, arm64]
+    is_default: true
+default_version: "22"
+architectures: [amd64, arm64]
+service_type: node
+has_web_ui: false
+health_check_timeout: 30
+params: []
+init_files: []
+
+# 预创建挂载目录（面板写 supervisor 配置）
+volumes_init:
+  - path: /www/server/node_22/supervisor
+    mode: "0755"
+
+install_hints:
+  - "Node.js 22 运行环境已就绪，可在「网站」创建 Node 项目时选择此版本"
+  - "Node.js 22 是最新 LTS，新项目推荐使用"
+  - "每个 Node 网站作为容器内独立进程运行，由面板自动管理启停"
+
+resource_limits:
+  memory_mb: 1024
+  cpus: 2.0
+  mem_reserve_mb: 256
+
+tabs:
+  - id: performance
+    label: 性能
+    type: performance

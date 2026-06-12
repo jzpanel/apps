@@ -1,0 +1,40 @@
+key: java_21
+name: Java 21
+description: Java 21 运行环境（容器化，Eclipse Temurin JDK，最新 LTS，新项目首选，无需在宿主机安装）
+category: runtime
+source: official
+icon: icon.svg
+runtime_type: java
+versions:
+  - display: "21"
+    tag: "21-jdk"
+    image: jzpanel/java
+    architectures: [amd64, arm64]
+    is_default: true
+default_version: "21"
+architectures: [amd64, arm64]
+service_type: java
+has_web_ui: false
+health_check_timeout: 30
+params: []
+init_files: []
+
+# 预创建挂载目录（面板写 supervisor 配置）
+volumes_init:
+  - path: /www/server/java_21/supervisor
+    mode: "0755"
+
+install_hints:
+  - "Java 21 运行环境已就绪，可在「网站」创建 Java 项目时选择此版本"
+  - "Java 21 是最新 LTS，新项目推荐使用"
+  - "启动命令通常为 'java -jar your-app.jar'，每个网站为独立 JVM 进程"
+
+resource_limits:
+  memory_mb: 2048
+  cpus: 2.0
+  mem_reserve_mb: 512
+
+tabs:
+  - id: performance
+    label: 性能
+    type: performance

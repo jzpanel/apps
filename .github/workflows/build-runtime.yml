@@ -11,16 +11,28 @@ on:
     paths:
       - 'node_20/Dockerfile'
       - 'node_18/Dockerfile'
+      - 'node_22/Dockerfile'
+      - 'node_16/Dockerfile'
       - 'go_122/Dockerfile'
       - 'java_17/Dockerfile'
+      - 'java_8/Dockerfile'
+      - 'java_11/Dockerfile'
+      - 'java_21/Dockerfile'
       - 'python_311/Dockerfile'
       - 'dotnet_80/Dockerfile'
+      - 'dotnet_60/Dockerfile'
       - 'node_20/init/**'
       - 'node_18/init/**'
+      - 'node_22/init/**'
+      - 'node_16/init/**'
       - 'go_122/init/**'
       - 'java_17/init/**'
+      - 'java_8/init/**'
+      - 'java_11/init/**'
+      - 'java_21/init/**'
       - 'python_311/init/**'
       - 'dotnet_80/init/**'
+      - 'dotnet_60/init/**'
       - '.github/workflows/build-runtime.yml'
   workflow_dispatch:
     inputs:
@@ -46,6 +58,16 @@ jobs:
             image: jzpanel/node
             tag: "18-alpine"
             platforms: "linux/amd64,linux/arm64"
+          - key: node_22
+            dir: node_22
+            image: jzpanel/node
+            tag: "22-alpine"
+            platforms: "linux/amd64,linux/arm64"
+          - key: node_16
+            dir: node_16
+            image: jzpanel/node
+            tag: "16-alpine"
+            platforms: "linux/amd64,linux/arm64"
           - key: go_122
             dir: go_122
             image: jzpanel/go
@@ -56,6 +78,21 @@ jobs:
             image: jzpanel/java
             tag: "17-jdk"
             platforms: "linux/amd64,linux/arm64"
+          - key: java_8
+            dir: java_8
+            image: jzpanel/java
+            tag: "8-jdk"
+            platforms: "linux/amd64,linux/arm64"
+          - key: java_11
+            dir: java_11
+            image: jzpanel/java
+            tag: "11-jdk"
+            platforms: "linux/amd64,linux/arm64"
+          - key: java_21
+            dir: java_21
+            image: jzpanel/java
+            tag: "21-jdk"
+            platforms: "linux/amd64,linux/arm64"
           - key: python_311
             dir: python_311
             image: jzpanel/python
@@ -65,6 +102,11 @@ jobs:
             dir: dotnet_80
             image: jzpanel/dotnet
             tag: "8.0-sdk"
+            platforms: "linux/amd64,linux/arm64"
+          - key: dotnet_60
+            dir: dotnet_60
+            image: jzpanel/dotnet
+            tag: "6.0-sdk"
             platforms: "linux/amd64,linux/arm64"
 
     steps:

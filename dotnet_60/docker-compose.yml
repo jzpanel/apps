@@ -1,0 +1,18 @@
+services:
+  dotnet:
+    image: jzpanel/dotnet:{{tag}}
+    container_name: panel_dotnet_60
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - /www/wwwroot:/www/wwwroot
+      - /www/server/dotnet_60/supervisor:/etc/supervisor/conf.d
+      - /www/logs/dotnet_60:/var/log/supervisor
+      - /www/wwwlogs:/www/wwwlogs
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}

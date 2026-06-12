@@ -1,0 +1,18 @@
+services:
+  node:
+    image: jzpanel/node:{{tag}}
+    container_name: panel_node_22
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - /www/wwwroot:/www/wwwroot
+      - /www/server/node_22/supervisor:/etc/supervisor/conf.d
+      - /www/logs/node_22:/var/log/supervisor
+      - /www/wwwlogs:/www/wwwlogs
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}

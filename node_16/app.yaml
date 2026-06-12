@@ -1,0 +1,41 @@
+key: node_16
+name: Node.js 16
+category: runtime
+description: Node.js 16 运行环境（容器化，适配老旧 Node 项目，无需在宿主机安装）
+source: official
+icon: icon.svg
+runtime_type: node
+versions:
+  - display: "16"
+    tag: "16-alpine"
+    image: jzpanel/node
+    architectures: [amd64, arm64]
+    is_default: true
+    deprecated: true
+default_version: "16"
+architectures: [amd64, arm64]
+service_type: node
+has_web_ui: false
+health_check_timeout: 30
+params: []
+init_files: []
+
+# 预创建挂载目录（面板写 supervisor 配置）
+volumes_init:
+  - path: /www/server/node_16/supervisor
+    mode: "0755"
+
+install_hints:
+  - "Node.js 16 运行环境已就绪，可在「网站」创建 Node 项目时选择此版本"
+  - "Node.js 16 已停止官方维护（EOL），仅建议用于运行老旧项目，新项目请使用 Node 20/22"
+  - "每个 Node 网站作为容器内独立进程运行，由面板自动管理启停"
+
+resource_limits:
+  memory_mb: 1024
+  cpus: 2.0
+  mem_reserve_mb: 256
+
+tabs:
+  - id: performance
+    label: 性能
+    type: performance
