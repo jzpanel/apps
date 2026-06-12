@@ -522,6 +522,16 @@ web_access:
   例如 MinIO 有 `api_port`（S3 接口）和 `console_port`（Web 控制台），应指向 `console_port`。
 - 不提供"修改密码"功能（各应用改密方式不同），密码仅展示供用户复制后去应用自身界面修改。
 
+**面板代理如何工作（无需理解即可写应用，了解原理便于排查）**：
+- 面板有一个专属"应用代理端口"（设置→应用代理端口，默认 18888，可改，改后需重启面板）。
+- 点"打开"时面板签发一次性 token，浏览器访问 `http(s)://<面板IP>:<代理端口>/?_ps=<token>`，
+  面板校验后种 cookie，**根路径**反代到应用容器端口。
+- 用"根路径"而非子路径，是为了让 SPA（如 MinIO 控制台、RedisInsight 这类前端单页应用）正常工作
+  —— 它们的资源/API/WebSocket 路径由 JS 运行时拼接，子路径反代会失效。
+- 因此**应用作者无需为面板代理做任何适配**：不需要配 base path，不需要改应用，
+  只要在 app.yaml 正确声明 `has_web_ui` + `web_access` 即可。
+- 面板代理不依赖用户安装 web server（nginx/apache），中间件/工具类应用开箱即用。
+
 ---
 
 ### 管理抽屉（manage / actions / tabs / php_extensions）
