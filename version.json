@@ -1,5 +1,5 @@
 {
-  "version": "1.0.12",
-  "updated_at": "2026-06-12T01:03:54Z",
-  "changelog": "本次更新涉及 4 个应用：go_122, java_17, node_18, node_20。详见 git log。"
+  "version": "1.0.13",
+  "updated_at": "2026-06-12T01:17:37Z",
+  "changelog": "本次更新涉及 2 个应用：dotnet_80, python_311。详见 git log。"
 }
