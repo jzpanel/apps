@@ -67,6 +67,13 @@ proxy_spec:
   ws_support: true
   description: "通过域名访问 MinIO 控制台，建议配置 HTTPS 保护管理界面"
 
+# Web 访问控制：MinIO 自带登录认证，可开启外部访问
+web_access:
+  auth: builtin
+  console_port_param: console_port
+  username_param: root_user
+  password_param: root_password
+
 install_guide:
   description: "MinIO 已安装，可以通过浏览器管理对象存储："
   features:

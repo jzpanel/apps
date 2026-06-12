@@ -71,6 +71,13 @@ proxy_spec:
   ws_support: false
   description: "通过域名访问 RabbitMQ 管理界面，建议配置 HTTPS 保护管理界面"
 
+# Web 访问控制：RabbitMQ 管理界面自带登录认证，可开启外部访问
+web_access:
+  auth: builtin
+  console_port_param: management_port
+  username_param: default_user
+  password_param: default_password
+
 install_guide:
   description: "RabbitMQ 已安装，可以通过浏览器管理消息队列："
   features:

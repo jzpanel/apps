@@ -53,6 +53,11 @@ proxy_spec:
   ws_support: false
   description: "通过域名访问 RedisInsight，建议配置 HTTPS 保护管理界面"
 
+# Web 访问控制：RedisInsight 自身无登录认证，强制只能面板代理访问
+web_access:
+  auth: none
+  console_port_param: port
+
 install_guide:
   description: "RedisInsight 已安装，可以通过浏览器管理 Redis："
   features:
