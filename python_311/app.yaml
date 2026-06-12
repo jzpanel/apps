@@ -1,0 +1,40 @@
+key: python_311
+name: Python 3.11
+description: Python 3.11 运行环境（容器化，内置 gunicorn/uvicorn，供 Python 网站使用，无需在宿主机安装）
+category: runtime
+source: official
+icon: icon.svg
+runtime_type: python
+versions:
+  - display: "3.11"
+    tag: "3.11-slim"
+    image: jzpanel/python
+    architectures: [amd64, arm64]
+    is_default: true
+default_version: "3.11"
+architectures: [amd64, arm64]
+service_type: python
+has_web_ui: false
+health_check_timeout: 30
+params: []
+init_files: []
+
+# 预创建挂载目录（面板写 supervisor 配置）
+volumes_init:
+  - path: /www/server/python_311/supervisor
+    mode: "0755"
+
+install_hints:
+  - "Python 3.11 运行环境已就绪，可在「网站」创建 Python 项目时选择此版本"
+  - "内置 gunicorn/uvicorn，启动命令示例：gunicorn -c gunicorn.conf.py main:app 或 uvicorn main:app --host 0.0.0.0 --port $PORT"
+  - "安装依赖命令可填 pip install -r requirements.txt（建站时在容器内执行）"
+
+resource_limits:
+  memory_mb: 1024
+  cpus: 2.0
+  mem_reserve_mb: 256
+
+tabs:
+  - id: performance
+    label: 性能
+    type: performance

@@ -13,10 +13,14 @@ on:
       - 'node_18/Dockerfile'
       - 'go_122/Dockerfile'
       - 'java_17/Dockerfile'
+      - 'python_311/Dockerfile'
+      - 'dotnet_80/Dockerfile'
       - 'node_20/init/**'
       - 'node_18/init/**'
       - 'go_122/init/**'
       - 'java_17/init/**'
+      - 'python_311/init/**'
+      - 'dotnet_80/init/**'
       - '.github/workflows/build-runtime.yml'
   workflow_dispatch:
     inputs:
@@ -51,6 +55,16 @@ jobs:
             dir: java_17
             image: jzpanel/java
             tag: "17-jdk"
+            platforms: "linux/amd64,linux/arm64"
+          - key: python_311
+            dir: python_311
+            image: jzpanel/python
+            tag: "3.11-slim"
+            platforms: "linux/amd64,linux/arm64"
+          - key: dotnet_80
+            dir: dotnet_80
+            image: jzpanel/dotnet
+            tag: "8.0-sdk"
             platforms: "linux/amd64,linux/arm64"
 
     steps:
