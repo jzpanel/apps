@@ -22,10 +22,11 @@
 9. [服务注册与依赖](#服务注册与依赖)
 10. [资源限制](#资源限制)
 11. [反代网站（proxy_spec）](#反代网站proxy_spec)
-12. [icon 与图标](#icon-与图标)
-13. [CI 校验](#ci-校验)
-14. [新增应用的标准流程](#新增应用的标准流程)
-15. [常见错误与排查](#常见错误与排查)
+12. [Web 访问控制（web_access）](#web-访问控制web_access)
+13. [icon 与图标](#icon-与图标)
+14. [CI 校验](#ci-校验)
+15. [新增应用的标准流程](#新增应用的标准流程)
+16. [常见错误与排查](#常见错误与排查)
 
 ---
 
@@ -480,6 +481,46 @@ proxy_spec:
 ```
 
 声明后，应用安装抽屉会出现"开启反代"开关；管理抽屉会有"反代网站"模块。
+
+---
+
+### Web 访问控制（web_access）
+
+> 仅 `has_web_ui: true` 的应用需要配置。用于控制带 Web 界面的应用能否对公网开放访问。
+
+**安全背景**：带 Web UI 的应用如果安装后直接把端口绑到 `0.0.0.0`，会暴露在公网。
+对于无登录认证的应用（如 RedisInsight），等于任何人都能访问管理界面。
+因此面板对所有 `has_web_ui` 应用**默认把访问端口绑定到 `127.0.0.1`**（只能本机/面板代理访问），
+是否开放公网由 `web_access` 声明决定。
+
+```yaml
+has_web_ui: true
+web_access:
+  auth: builtin                  # builtin（应用自带登录）| none（无登录认证）
+  console_port_param: console_port   # 访问端口对应的安装参数 key
+                                     # 留空时回退到第一个 number 类型且 key 含 "port" 的参数
+  username_param: root_user          # 用户名对应的安装参数 key（仅 builtin 需要，管理抽屉展示）
+  password_param: root_password      # 密码对应的安装参数 key（仅 builtin 需要，管理抽屉脱敏展示供复制）
+```
+
+**auth 取值与行为：**
+
+| auth | 含义 | 行为 |
+|------|------|------|
+| `builtin` | 应用自带登录认证（MinIO/RabbitMQ） | 默认绑 127.0.0.1；用户可在管理抽屉手动开"外部访问"；展示用户名/密码 |
+| `none` | 应用无任何登录认证（RedisInsight） | 默认绑 127.0.0.1；"外部访问"开关置灰禁用，**只能通过面板代理访问** |
+
+**默认值**：未声明 `web_access` 时，`has_web_ui` 应用按 `auth: none` 处理（最安全，强制只能面板访问）。
+
+**管理抽屉表现**：`has_web_ui` 应用的「概览」tab 会显示「访问信息」卡片：
+- 「打开」按钮（经面板代理访问，复用面板登录态鉴权）
+- 「外部访问」开关（`builtin` 可用，`none` 置灰）
+- 访问地址、用户名、密码（`builtin` 才显示账号密码，只读展示供复制，不提供改密）
+
+**注意**：
+- `console_port_param` 应指向"Web 控制台端口"，不要指向数据端口。
+  例如 MinIO 有 `api_port`（S3 接口）和 `console_port`（Web 控制台），应指向 `console_port`。
+- 不提供"修改密码"功能（各应用改密方式不同），密码仅展示供用户复制后去应用自身界面修改。
 
 ---
 
@@ -1425,6 +1466,7 @@ reload_cmd: "openresty -s reload"
 | `service_dependencies[]` | list | optional | 服务类型依赖 |
 | `resource_limits` | object | optional | CPU/内存默认 |
 | `proxy_spec` | object | optional | 反代支持声明 |
+| `web_access` | object | optional | Web 访问控制（仅 has_web_ui，控制外部访问/展示账号密码） |
 | `db_init` | object | optional | 自动建库建用户 |
 | `db_dump` | object | optional | 多容器备份配置 |
 | `install_hints[]` | list | optional | 安装完成提示 |
