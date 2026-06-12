@@ -1,0 +1,28 @@
+services:
+  rabbitmq:
+    image: rabbitmq:{{tag}}
+    container_name: panel_rabbitmq
+    hostname: panel-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: "{{default_user}}"
+      RABBITMQ_DEFAULT_PASS: "{{default_password}}"
+    ports:
+      - "{{amqp_port}}:5672"
+      - "{{management_port}}:15672"
+    volumes:
+      - /www/server/rabbitmq/data:/var/lib/rabbitmq
+    networks:
+      - panel_network
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}
+
+networks:
+  panel_network:
+    external: true
+    name: panel_network

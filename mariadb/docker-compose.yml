@@ -1,0 +1,28 @@
+services:
+  mariadb:
+    image: mariadb:{{tag}}
+    container_name: panel_mariadb
+    restart: unless-stopped
+    ports:
+      - "{{port}}:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: "{{root_password}}"
+      MARIADB_ROOT_HOST: "%"
+    volumes:
+      - /www/server/mariadb/data:/var/lib/mysql
+      - /www/server/mariadb/my.cnf:/etc/mysql/conf.d/custom.cnf:ro
+      - /www/logs/mariadb:/var/log/mysql
+    networks:
+      - panel_network
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}
+
+networks:
+  panel_network:
+    external: true
+    name: panel_network

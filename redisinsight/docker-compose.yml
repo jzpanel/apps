@@ -1,0 +1,23 @@
+services:
+  redisinsight:
+    image: redis/redisinsight:{{tag}}
+    container_name: panel_redisinsight
+    restart: unless-stopped
+    ports:
+      - "{{port}}:5540"
+    volumes:
+      - /www/server/redisinsight/data:/data
+    networks:
+      - panel_network
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}
+
+networks:
+  panel_network:
+    external: true
+    name: panel_network

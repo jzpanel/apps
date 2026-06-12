@@ -1,0 +1,82 @@
+key: rabbitmq
+name: RabbitMQ
+category: middleware
+description: 广泛使用的开源消息队列中间件，支持 AMQP 协议，适合异步任务、应用解耦、流量削峰
+source: official
+icon: icon.svg
+versions:
+  - display: "4"
+    tag: "4-management"
+    image: rabbitmq
+    architectures: [amd64, arm64]
+    is_default: true
+  - display: "3.13"
+    tag: "3.13-management"
+    image: rabbitmq
+    architectures: [amd64, arm64]
+default_version: "4"
+architectures: [amd64, arm64]
+has_web_ui: true
+health_check_timeout: 60
+
+params:
+  - key: amqp_port
+    label: AMQP 端口（程序连接使用）
+    type: number
+    default: 5672
+    required: true
+  - key: management_port
+    label: 管理界面端口
+    type: number
+    default: 15672
+    required: true
+  - key: default_user
+    label: 默认用户名
+    type: text
+    default: admin
+    required: true
+  - key: default_password
+    label: 默认密码
+    type: password
+    default: ""
+    required: true
+    auto_generate: true
+
+# RabbitMQ 容器以 UID 999 运行，预先 chown 数据目录
+volumes_init:
+  - path: /www/server/rabbitmq/data
+    uid: 999
+    gid: 999
+    mode: "0755"
+
+manage: []
+
+install_hints:
+  - "管理界面：http://服务器IP:管理界面端口，用安装时设置的用户名密码登录"
+  - "程序连接（AMQP）：amqp://用户名:密码@panel_rabbitmq:5672（同 panel_network 内）或 服务器IP:AMQP端口"
+  - "镜像已内置管理插件（-management），开箱即用"
+
+resource_limits:
+  memory_mb: 512
+  cpus: 1.0
+  mem_reserve_mb: 256
+
+tabs:
+  - id: performance
+    label: 性能
+    type: performance
+
+proxy_spec:
+  port_param: management_port
+  ws_support: false
+  description: "通过域名访问 RabbitMQ 管理界面，建议配置 HTTPS 保护管理界面"
+
+install_guide:
+  description: "RabbitMQ 已安装，可以通过浏览器管理消息队列："
+  features:
+    - "消息队列 - 支持 AMQP 协议，可靠的消息投递"
+    - "管理界面 - 监控队列、连接、交换机、消费者"
+    - "用户权限 - 管理虚拟主机和用户访问控制"
+  primary_action:
+    label: "打开 RabbitMQ 管理界面"
+    route: "/apps"

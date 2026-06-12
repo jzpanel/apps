@@ -1,0 +1,78 @@
+key: minio
+name: MinIO
+category: tools
+description: 高性能对象存储服务，兼容 Amazon S3 协议，适合存储图片、视频、备份等海量非结构化数据
+source: official
+icon: icon.svg
+versions:
+  - display: "latest"
+    tag: "latest"
+    image: minio/minio
+    architectures: [amd64, arm64]
+    rolling: true
+    is_default: true
+default_version: "latest"
+architectures: [amd64, arm64]
+has_web_ui: true
+health_check_timeout: 30
+
+params:
+  - key: api_port
+    label: API 端口（S3 接口，给程序使用）
+    type: number
+    default: 9000
+    required: true
+  - key: console_port
+    label: 控制台端口（Web 管理界面）
+    type: number
+    default: 9001
+    required: true
+  - key: root_user
+    label: 管理员账号
+    type: text
+    default: minioadmin
+    required: true
+  - key: root_password
+    label: 管理员密码
+    type: password
+    default: ""
+    required: true
+    auto_generate: true
+
+# MinIO 容器默认以 root 运行，data 目录 0755 即可
+volumes_init:
+  - path: /www/server/minio/data
+    mode: "0755"
+
+manage: []
+
+install_hints:
+  - "控制台（Web 管理界面）：http://服务器IP:控制台端口，用安装时设置的管理员账号密码登录"
+  - "API 地址（程序连接用）：http://服务器IP:API端口，兼容 S3 协议"
+  - "首次登录后在控制台创建 Bucket（存储桶）并生成 Access Key"
+  - "管理员密码至少 8 位（自动生成的密码已满足要求）"
+
+resource_limits:
+  memory_mb: 512
+  cpus: 1.0
+  mem_reserve_mb: 256
+
+tabs:
+  - id: performance
+    label: 性能
+    type: performance
+
+proxy_spec:
+  port_param: console_port
+  ws_support: true
+  description: "通过域名访问 MinIO 控制台，建议配置 HTTPS 保护管理界面"
+
+install_guide:
+  description: "MinIO 已安装，可以通过浏览器管理对象存储："
+  features:
+    - "对象存储 - 兼容 S3 协议，存储海量文件"
+    - "存储桶管理 - 创建 Bucket、设置访问策略"
+    - "访问密钥 - 生成 Access Key 供程序接入"
+  primary_action:
+    label: "打开 MinIO 控制台"
+    route: "/apps"
