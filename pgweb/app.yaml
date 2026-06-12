@@ -79,6 +79,11 @@ proxy_spec:
   ws_support: false
   description: "通过域名访问 pgweb，建议配置 HTTPS 保护数据库管理界面"
 
+# Web 访问控制：pgweb 默认无登录认证，强制只能面板代理访问
+web_access:
+  auth: none
+  console_port_param: port
+
 install_guide:
   description: "pgweb 已安装，可以通过浏览器管理 PostgreSQL："
   features:

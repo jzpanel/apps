@@ -103,6 +103,13 @@ proxy_spec:
   ws_support: false
   description: "通过域名访问 Mongo Express，建议配置 HTTPS 保护数据库管理界面"
 
+# Web 访问控制：Mongo Express 自带 Basic Auth 登录
+web_access:
+  auth: builtin
+  console_port_param: port
+  username_param: admin_username
+  password_param: admin_password
+
 install_guide:
   description: "Mongo Express 已安装，可以通过浏览器管理 MongoDB："
   features:

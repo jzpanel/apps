@@ -60,6 +60,11 @@ proxy_spec:
   ws_support: false
   description: "通过域名访问 phpMyAdmin，建议配置 HTTPS 保护数据库管理界面"
 
+# Web 访问控制：phpMyAdmin 登录页需输入数据库账号密码（自带认证）
+web_access:
+  auth: builtin
+  console_port_param: port
+
 install_guide:
   description: "phpMyAdmin 已安装，可以通过浏览器管理 MySQL 数据库："
   features:
