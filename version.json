@@ -1,5 +1,5 @@
 {
-  "version": "1.0.13",
-  "updated_at": "2026-06-12T01:17:37Z",
-  "changelog": "本次更新涉及 2 个应用：dotnet_80, python_311。详见 git log。"
+  "version": "1.0.14",
+  "updated_at": "2026-06-12T01:50:18Z",
+  "changelog": "本次更新涉及 6 个应用：dotnet_60, java_11, java_21, java_8, node_16, node_22。详见 git log。"
 }
