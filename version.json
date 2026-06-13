@@ -1,5 +1,5 @@
 {
-  "version": "1.0.20",
-  "updated_at": "2026-06-13T04:56:58Z",
-  "changelog": "本次更新涉及 1 个应用：ollama。详见 git log。"
+  "version": "1.0.21",
+  "updated_at": "2026-06-13T06:15:13Z",
+  "changelog": "本次更新涉及 3 个应用：astrbot, langbot, openclaw。详见 git log。"
 }
