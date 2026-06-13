@@ -1,0 +1,57 @@
+key: ollama
+name: Ollama
+category: ai
+description: 本地运行大语言模型的工具，支持 Llama、Qwen、DeepSeek、Mistral 等，提供 OpenAI 兼容 API
+source: official
+icon: icon.svg
+versions:
+  - display: "latest"
+    tag: "latest"
+    image: ollama/ollama
+    architectures: [amd64, arm64]
+    rolling: true
+    is_default: true
+default_version: "latest"
+architectures: [amd64, arm64]
+has_web_ui: false
+health_check_timeout: 60
+
+params:
+  - key: port
+    label: API 端口
+    type: number
+    default: 11434
+    required: true
+
+# Ollama 容器以 root 运行，模型数据目录 0755 即可
+volumes_init:
+  - path: /www/server/ollama/data
+    mode: "0755"
+
+manage: []
+
+install_hints:
+  - "Ollama 是模型运行后端，没有 Web 界面，通过 API 提供服务"
+  - "程序/Open WebUI 连接地址：http://panel_ollama:11434（同 panel_network 内）或 服务器IP:端口"
+  - "拉取模型：在容器内执行 ollama pull qwen2.5，或安装 Open WebUI 后在界面拉取"
+  - "默认 CPU 模式运行；如需 GPU 加速，请确保宿主机已装 NVIDIA Container Toolkit 后手动调整 compose"
+
+resource_limits:
+  memory_mb: 4096
+  cpus: 4.0
+  mem_reserve_mb: 1024
+
+tabs:
+  - id: performance
+    label: 性能
+    type: performance
+
+install_guide:
+  description: "Ollama 已安装，作为本地大模型运行后端："
+  features:
+    - "本地模型 - 运行 Llama、Qwen、DeepSeek 等开源大模型"
+    - "OpenAI 兼容 API - 标准接口，便于程序接入"
+    - "搭配 Open WebUI - 安装 Open WebUI 获得 ChatGPT 式聊天界面"
+  primary_action:
+    label: "前往应用商店安装 Open WebUI"
+    route: "/apps"

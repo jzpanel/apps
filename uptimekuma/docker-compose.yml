@@ -1,0 +1,23 @@
+services:
+  uptimekuma:
+    image: louislam/uptime-kuma:{{tag}}
+    container_name: panel_uptimekuma
+    restart: unless-stopped
+    ports:
+      - "{{port}}:3001"
+    volumes:
+      - /www/server/uptimekuma/data:/app/data
+    networks:
+      - panel_network
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}
+
+networks:
+  panel_network:
+    external: true
+    name: panel_network

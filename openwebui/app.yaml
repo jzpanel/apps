@@ -1,0 +1,68 @@
+key: openwebui
+name: Open WebUI
+category: ai
+description: 功能丰富的 AI 聊天 Web 界面，对接 Ollama 本地模型，支持多模型切换、对话历史、RAG 知识库
+source: official
+icon: icon.svg
+versions:
+  - display: "main"
+    tag: "main"
+    image: ghcr.io/open-webui/open-webui
+    architectures: [amd64, arm64]
+    rolling: true
+    is_default: true
+default_version: "main"
+architectures: [amd64, arm64]
+has_web_ui: true
+health_check_timeout: 60
+dependencies:
+  - ollama
+
+params:
+  - key: port
+    label: 访问端口
+    type: number
+    default: 8088
+    required: true
+
+# Open WebUI 容器以 root 运行，数据目录 0755 即可
+volumes_init:
+  - path: /www/server/openwebui/data
+    mode: "0755"
+
+manage: []
+
+install_hints:
+  - "通过浏览器访问 http://服务器IP:端口 进入聊天界面"
+  - "首次访问需注册账号，第一个注册的账号自动成为管理员"
+  - "已自动连接 Ollama（panel_ollama:11434），在界面右上角可拉取和切换模型"
+
+resource_limits:
+  memory_mb: 1024
+  cpus: 1.0
+  mem_reserve_mb: 256
+
+tabs:
+  - id: performance
+    label: 性能
+    type: performance
+
+proxy_spec:
+  port_param: port
+  ws_support: true
+  description: "通过域名访问 Open WebUI，建议配置 HTTPS 保护聊天界面"
+
+# Web 访问控制：Open WebUI 自带账号登录（首个注册账号为管理员），可开启外部访问
+web_access:
+  auth: builtin
+  console_port_param: port
+
+install_guide:
+  description: "Open WebUI 已安装，可以通过浏览器与本地大模型对话："
+  features:
+    - "多模型聊天 - 切换 Ollama 中的各种大模型"
+    - "对话历史 - 保存和管理多轮对话"
+    - "知识库 RAG - 上传文档进行检索增强问答"
+  primary_action:
+    label: "打开 Open WebUI"
+    route: "/apps"

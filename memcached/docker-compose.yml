@@ -1,0 +1,22 @@
+services:
+  memcached:
+    image: memcached:{{tag}}
+    container_name: panel_memcached
+    restart: unless-stopped
+    command: memcached -m {{memory_limit}}
+    ports:
+      - "{{port}}:11211"
+    networks:
+      - panel_network
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}
+
+networks:
+  panel_network:
+    external: true
+    name: panel_network

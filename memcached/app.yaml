@@ -1,0 +1,56 @@
+key: memcached
+name: Memcached
+category: middleware
+description: 高性能分布式内存缓存系统，简单高效，常用于缓存数据库查询结果、会话、API 响应以减轻后端压力
+source: official
+icon: icon.svg
+versions:
+  - display: "1.6"
+    tag: "1.6-alpine"
+    image: memcached
+    architectures: [amd64, arm64]
+    rolling: true
+    is_default: true
+default_version: "1.6"
+architectures: [amd64, arm64]
+has_web_ui: false
+health_check_timeout: 30
+
+params:
+  - key: port
+    label: 端口
+    type: number
+    default: 11211
+    required: true
+  - key: memory_limit
+    label: 最大内存（MB）
+    type: number
+    default: 64
+    required: true
+
+manage: []
+
+install_hints:
+  - "Memcached 是纯内存缓存，没有 Web 界面，通过协议端口提供服务"
+  - "程序连接地址：panel_memcached:11211（同 panel_network 内）或 服务器IP:端口"
+  - "Memcached 不持久化数据，重启后缓存清空（设计如此）"
+
+resource_limits:
+  memory_mb: 256
+  cpus: 0.5
+  mem_reserve_mb: 64
+
+tabs:
+  - id: performance
+    label: 性能
+    type: performance
+
+install_guide:
+  description: "Memcached 已安装，作为应用的内存缓存后端："
+  features:
+    - "高速缓存 - 纯内存存储，读写极快"
+    - "减轻数据库压力 - 缓存查询结果、会话数据"
+    - "简单协议 - 广泛被各类框架和语言支持"
+  primary_action:
+    label: "前往应用列表"
+    route: "/apps"

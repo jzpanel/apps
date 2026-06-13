@@ -1,0 +1,23 @@
+services:
+  cloudreve:
+    image: cloudreve/cloudreve:{{tag}}
+    container_name: panel_cloudreve
+    restart: unless-stopped
+    ports:
+      - "{{port}}:5212"
+    volumes:
+      - /www/server/cloudreve/data:/cloudreve/data
+    networks:
+      - panel_network
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}
+
+networks:
+  panel_network:
+    external: true
+    name: panel_network

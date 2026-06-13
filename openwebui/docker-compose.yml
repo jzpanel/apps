@@ -1,0 +1,25 @@
+services:
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:{{tag}}
+    container_name: panel_openwebui
+    restart: unless-stopped
+    ports:
+      - "{{port}}:8080"
+    environment:
+      OLLAMA_BASE_URL: "http://panel_ollama:11434"
+    volumes:
+      - /www/server/openwebui/data:/app/backend/data
+    networks:
+      - panel_network
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}
+
+networks:
+  panel_network:
+    external: true
+    name: panel_network

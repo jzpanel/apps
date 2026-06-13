@@ -1,0 +1,64 @@
+key: adminer
+name: Adminer
+category: tools
+description: 轻量级全能数据库管理工具，单文件设计，支持 MySQL、MariaDB、PostgreSQL、SQLite、MongoDB 等
+source: official
+icon: icon.svg
+versions:
+  - display: "5"
+    tag: "5"
+    image: adminer
+    architectures: [amd64, arm64]
+    is_default: true
+  - display: "4"
+    tag: "4"
+    image: adminer
+    architectures: [amd64, arm64]
+default_version: "5"
+architectures: [amd64, arm64]
+has_web_ui: true
+health_check_timeout: 30
+
+params:
+  - key: port
+    label: 访问端口
+    type: number
+    default: 8086
+    required: true
+
+manage: []
+
+install_hints:
+  - "通过浏览器访问 http://服务器IP:端口 进入管理界面"
+  - "登录页填写数据库连接信息：连面板 MySQL 服务器填 panel_mysql_80、MariaDB 填 panel_mariadb、PostgreSQL 填 panel_postgresql（同 panel_network）"
+  - "支持 MySQL、MariaDB、PostgreSQL、SQLite、MongoDB 等多种数据库"
+
+resource_limits:
+  memory_mb: 256
+  cpus: 0.5
+  mem_reserve_mb: 128
+
+tabs:
+  - id: performance
+    label: 性能
+    type: performance
+
+proxy_spec:
+  port_param: port
+  ws_support: false
+  description: "通过域名访问 Adminer，建议配置 HTTPS 保护数据库管理界面"
+
+# Web 访问控制：Adminer 登录页需输入数据库账号密码（自带认证），可开启外部访问
+web_access:
+  auth: builtin
+  console_port_param: port
+
+install_guide:
+  description: "Adminer 已安装，可以通过浏览器管理各类数据库："
+  features:
+    - "多数据库支持 - MySQL、MariaDB、PostgreSQL、SQLite、MongoDB"
+    - "SQL 执行 - 直接执行 SQL 语句、查看执行计划"
+    - "数据导入导出 - 支持 SQL、CSV 等格式"
+  primary_action:
+    label: "打开 Adminer"
+    route: "/apps"
