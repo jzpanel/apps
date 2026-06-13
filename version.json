@@ -1,5 +1,5 @@
 {
-  "version": "1.0.22",
-  "updated_at": "2026-06-13T06:27:43Z",
-  "changelog": "本次更新涉及 5 个应用：adminer, astrbot, cloudreve, langbot, openclaw。详见 git log。"
+  "version": "1.0.23",
+  "updated_at": "2026-06-13T06:32:53Z",
+  "changelog": "本次更新涉及 6 个应用：mongodb, mongoexpress, mysql, phpmyadmin, postgresql, redis。详见 git log。"
 }
