@@ -1,0 +1,23 @@
+services:
+  openclaw:
+    image: ghcr.io/openclaw/openclaw:{{tag}}
+    container_name: panel_openclaw
+    restart: unless-stopped
+    ports:
+      - "{{port}}:18789"
+    volumes:
+      - /www/server/openclaw/data:/home/node/.openclaw
+    networks:
+      - panel_network
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}
+
+networks:
+  panel_network:
+    external: true
+    name: panel_network

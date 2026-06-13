@@ -1,0 +1,71 @@
+key: langbot
+name: LangBot
+category: ai
+description: 开源的 LLM 原生即时通讯机器人平台，支持 QQ、微信、Telegram、飞书、Discord 等，可视化 WebUI 配置
+source: official
+icon: icon.svg
+versions:
+  - display: "4.10"
+    tag: "v4.10.1"
+    image: rockchin/langbot
+    architectures: [amd64, arm64]
+    is_default: true
+  - display: "latest"
+    tag: "latest"
+    image: rockchin/langbot
+    architectures: [amd64, arm64]
+    rolling: true
+default_version: "4.10"
+architectures: [amd64, arm64]
+has_web_ui: true
+health_check_timeout: 60
+
+params:
+  - key: webui_port
+    label: WebUI 端口
+    type: number
+    default: 5300
+    required: true
+
+# LangBot 容器以 root 运行，data 目录 0755 即可
+volumes_init:
+  - path: /www/server/langbot/data
+    mode: "0755"
+
+manage: []
+
+install_hints:
+  - "通过浏览器访问 http://服务器IP:WebUI端口 进入管理后台，首次访问需注册管理员账号"
+  - "在后台配置大模型：可填面板 Ollama 地址 http://panel_ollama:11434/v1（API Key 任意填 ollama），或填云端 API"
+  - "在后台接入消息平台（QQ / 微信 / Telegram / 飞书 / Discord 等）"
+  - "平台反向连接端口 2280-2285（部分 QQ/平台回调使用），已自动映射"
+
+resource_limits:
+  memory_mb: 1024
+  cpus: 1.0
+  mem_reserve_mb: 256
+
+tabs:
+  - id: performance
+    label: 性能
+    type: performance
+
+proxy_spec:
+  port_param: webui_port
+  ws_support: true
+  description: "通过域名访问 LangBot 管理后台，建议配置 HTTPS"
+
+# Web 访问控制：LangBot WebUI 首次设置管理员账号密码（自带认证）
+web_access:
+  auth: builtin
+  console_port_param: webui_port
+
+install_guide:
+  description: "LangBot 已安装，可以搭建多平台 AI 聊天机器人："
+  features:
+    - "多平台接入 - QQ、微信、Telegram、飞书、Discord"
+    - "对接大模型 - 本地 Ollama 或云端 API，支持 Dify"
+    - "可视化配置 - 流水线、人格、插件全在 WebUI 配置"
+  primary_action:
+    label: "打开 LangBot 管理后台"
+    route: "/apps"

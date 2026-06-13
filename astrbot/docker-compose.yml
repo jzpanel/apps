@@ -1,0 +1,24 @@
+services:
+  astrbot:
+    image: soulter/astrbot:{{tag}}
+    container_name: panel_astrbot
+    restart: unless-stopped
+    ports:
+      - "{{webui_port}}:6185"
+      - "6199:6199"
+    volumes:
+      - /www/server/astrbot/data:/AstrBot/data
+    networks:
+      - panel_network
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}
+
+networks:
+  panel_network:
+    external: true
+    name: panel_network

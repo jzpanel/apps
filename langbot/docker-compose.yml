@@ -1,0 +1,27 @@
+services:
+  langbot:
+    image: rockchin/langbot:{{tag}}
+    container_name: panel_langbot
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Shanghai
+      - BOX__ENABLED=false
+    ports:
+      - "{{webui_port}}:5300"
+      - "2280-2285:2280-2285"
+    volumes:
+      - /www/server/langbot/data:/app/data
+    networks:
+      - panel_network
+    deploy:
+      resources:
+        limits:
+          memory: {{mem_limit}}
+          cpus: "{{cpu_limit}}"
+        reservations:
+          memory: {{mem_reserve}}
+
+networks:
+  panel_network:
+    external: true
+    name: panel_network

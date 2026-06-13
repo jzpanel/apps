@@ -1,0 +1,70 @@
+key: openclaw
+name: OpenClaw
+category: ai
+description: 开源自托管的个人 AI 助理智能体，可接入微信、Telegram、Discord、Slack 等消息平台，对接本地或云端大模型
+source: official
+icon: icon.svg
+versions:
+  - display: "latest"
+    tag: "latest"
+    image: ghcr.io/openclaw/openclaw
+    architectures: [amd64, arm64]
+    rolling: true
+    is_default: true
+default_version: "latest"
+architectures: [amd64, arm64]
+has_web_ui: true
+health_check_timeout: 60
+
+params:
+  - key: port
+    label: 访问端口（Control UI / Gateway）
+    type: number
+    default: 18789
+    required: true
+
+# OpenClaw 容器以 node 用户（UID 1000）运行，预创建并 chown 配置目录
+volumes_init:
+  - path: /www/server/openclaw/data
+    uid: 1000
+    gid: 1000
+    mode: "0755"
+
+manage: []
+
+install_hints:
+  - "通过浏览器访问 http://服务器IP:端口 打开 Control UI 控制台"
+  - "首次需配对令牌（gateway token）：执行 docker logs panel_openclaw 查看，或在 /www/server/openclaw/data/openclaw.json 中获取"
+  - "在控制台配置大模型：可填面板 Ollama 地址 http://panel_ollama:11434/v1（API Key 任意填 ollama），或填云端 API"
+  - "在控制台接入微信 / Telegram / Discord 等消息平台（需对应平台的 bot token）"
+  - "运行内存需 ≥ 2GB（1GB 会因内存不足崩溃）"
+
+resource_limits:
+  memory_mb: 2048
+  cpus: 2.0
+  mem_reserve_mb: 512
+
+tabs:
+  - id: performance
+    label: 性能
+    type: performance
+
+proxy_spec:
+  port_param: port
+  ws_support: true
+  description: "通过域名访问 OpenClaw Control UI，建议配置 HTTPS"
+
+# Web 访问控制：OpenClaw Control UI 用 gateway token 配对（自带鉴权）
+web_access:
+  auth: builtin
+  console_port_param: port
+
+install_guide:
+  description: "OpenClaw 已安装，可以搭建你的个人 AI 助理智能体："
+  features:
+    - "多平台接入 - 微信、Telegram、Discord、Slack 等"
+    - "对接大模型 - 本地 Ollama 或云端 API"
+    - "技能与自动化 - 文件操作、定时任务、工具调用"
+  primary_action:
+    label: "打开 OpenClaw 控制台"
+    route: "/apps"

@@ -1,0 +1,71 @@
+key: astrbot
+name: AstrBot
+category: ai
+description: 易于上手的多平台 AI 聊天机器人及开发框架，支持 QQ、微信、飞书、钉钉、Telegram、Discord 等，可视化 WebUI
+source: official
+icon: icon.svg
+versions:
+  - display: "4.25"
+    tag: "v4.25.5"
+    image: soulter/astrbot
+    architectures: [amd64, arm64]
+    is_default: true
+  - display: "latest"
+    tag: "latest"
+    image: soulter/astrbot
+    architectures: [amd64, arm64]
+    rolling: true
+default_version: "4.25"
+architectures: [amd64, arm64]
+has_web_ui: true
+health_check_timeout: 60
+
+params:
+  - key: webui_port
+    label: WebUI 端口
+    type: number
+    default: 6185
+    required: true
+
+# AstrBot 容器以 root 运行，data 目录 0755 即可
+volumes_init:
+  - path: /www/server/astrbot/data
+    mode: "0755"
+
+manage: []
+
+install_hints:
+  - "通过浏览器访问 http://服务器IP:WebUI端口 打开管理面板"
+  - "首次登录密码是随机生成的：执行 docker logs panel_astrbot 查看，找到用户名（默认 astrbot）和密码，登录后请立即修改"
+  - "在面板配置大模型：可填面板 Ollama 地址 http://panel_ollama:11434/v1（API Key 任意填 ollama），或填云端 API"
+  - "在面板接入消息平台（QQ / 微信 / 飞书 / 钉钉 / Telegram / Discord 等）"
+
+resource_limits:
+  memory_mb: 1024
+  cpus: 1.0
+  mem_reserve_mb: 256
+
+tabs:
+  - id: performance
+    label: 性能
+    type: performance
+
+proxy_spec:
+  port_param: webui_port
+  ws_support: true
+  description: "通过域名访问 AstrBot 管理面板，建议配置 HTTPS"
+
+# Web 访问控制：AstrBot WebUI 首次用日志中的随机密码登录（自带认证）
+web_access:
+  auth: builtin
+  console_port_param: webui_port
+
+install_guide:
+  description: "AstrBot 已安装，可以搭建多平台 AI 聊天机器人："
+  features:
+    - "多平台接入 - QQ、微信、飞书、钉钉、Telegram、Discord"
+    - "对接大模型 - 本地 Ollama 或云端 API"
+    - "插件生态 - 丰富的插件市场与开发框架"
+  primary_action:
+    label: "打开 AstrBot 管理面板"
+    route: "/apps"
