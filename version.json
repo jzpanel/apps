@@ -1,5 +1,5 @@
 {
-  "version": "1.0.18",
-  "updated_at": "2026-06-12T12:17:54Z",
-  "changelog": "本次更新涉及 3 个应用：mongoexpress, pgweb, phpmyadmin。详见 git log。"
+  "version": "1.0.19",
+  "updated_at": "2026-06-13T03:15:31Z",
+  "changelog": "本次更新涉及 6 个应用：adminer, cloudreve, memcached, ollama, openwebui, uptimekuma。详见 git log。"
 }
