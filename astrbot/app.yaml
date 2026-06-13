@@ -3,7 +3,7 @@ name: AstrBot
 category: ai
 description: 易于上手的多平台 AI 聊天机器人及开发框架，支持 QQ、微信、飞书、钉钉、Telegram、Discord 等，可视化 WebUI
 source: official
-icon: icon.svg
+icon: icon.png
 versions:
   - display: "4.25"
     tag: "v4.25.5"

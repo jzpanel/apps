@@ -3,7 +3,7 @@ name: LangBot
 category: ai
 description: 开源的 LLM 原生即时通讯机器人平台，支持 QQ、微信、Telegram、飞书、Discord 等，可视化 WebUI 配置
 source: official
-icon: icon.svg
+icon: icon.png
 versions:
   - display: "4.10"
     tag: "v4.10.1"

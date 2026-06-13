@@ -3,7 +3,7 @@ name: OpenClaw
 category: ai
 description: 开源自托管的个人 AI 助理智能体，可接入微信、Telegram、Discord、Slack 等消息平台，对接本地或云端大模型
 source: official
-icon: icon.svg
+icon: icon.png
 versions:
   - display: "latest"
     tag: "latest"

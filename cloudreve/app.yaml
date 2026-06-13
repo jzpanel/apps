@@ -3,7 +3,7 @@ name: Cloudreve
 category: utility
 description: 国产开源自托管网盘，支持本地存储、对象存储（MinIO/S3/OSS）、文件分享、多用户管理
 source: official
-icon: icon.svg
+icon: icon.png
 versions:
   - display: "4.16"
     tag: "4.16.1"
