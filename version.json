@@ -1,5 +1,5 @@
 {
-  "version": "1.0.23",
-  "updated_at": "2026-06-18T00:00:00Z",
-  "changelog": "更新 31 个应用配置（补充 recommended/sort_weight 等元数据），更新 astrbot、openclaw 图标。"
+  "version": "1.0.24",
+  "updated_at": "2026-06-18T05:37:45Z",
+  "changelog": "本次更新涉及 29 个应用：adminer, apache, astrbot, langbot, mariadb, memcached, minio, mongodb, mongoexpress, mysql, nginx, node_20, node_22, ollama, openclaw, openresty, openwebui, pgweb, php_74, php_80, php_81, php_82, php_83, phpmyadmin, postgresql, pureftpd, python_311, redis, redisinsight。详见 git log。"
 }
