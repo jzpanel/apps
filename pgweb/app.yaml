@@ -3,13 +3,9 @@ name: pgweb
 category: tools
 description: PostgreSQL 的轻量级 Web 客户端，支持 SQL 执行、数据浏览、导出
 source: official
+sort_weight: 610
 icon: icon.svg
 versions:
-  - display: "latest"
-    tag: "latest"
-    image: sosedoff/pgweb
-    architectures: [amd64, arm64]
-    rolling: true
   - display: "0.15"
     tag: "0.15.0"
     image: sosedoff/pgweb

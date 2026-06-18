@@ -3,16 +3,16 @@ name: Ollama
 category: ai
 description: 本地运行大语言模型的工具，支持 Llama、Qwen、DeepSeek、Mistral 等，提供 OpenAI 兼容 API
 source: official
+sort_weight: 515
 icon: icon.svg
 service_type: llm
 versions:
-  - display: "latest"
-    tag: "latest"
+  - display: "0.30"
+    tag: "0.30.8"
     image: ollama/ollama
     architectures: [amd64, arm64]
-    rolling: true
     is_default: true
-default_version: "latest"
+default_version: "0.30"
 architectures: [amd64, arm64]
 has_web_ui: false
 health_check_timeout: 60

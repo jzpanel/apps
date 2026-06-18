@@ -4,7 +4,7 @@
 
 > 维护者：核心团队
 > 适用范围：jzpanel/apps 仓库下所有应用
-> 版本：v1.0（2026-05-25）
+> 版本：v1.1（2026-06-14）
 > 关联：spec/app-image-version-reliability
 
 ---
@@ -780,6 +780,55 @@ has_web_ui: true                        # 是否有 Web UI（影响首页"打开
 version_key_template: "php_{{version_nodot}}"   # 多版本应用的 key 模板
 reload_cmd: "nginx -s reload"           # 配置热重载命令（默认按 service_type 选）
 ```
+
+---
+
+### 列表排序与标签（recommended / hot / sort_weight）
+
+控制应用在前端商店列表中的排列顺序和标签展示。常用应用排前面，并可加"推荐/热门"标签提升辨识度。
+
+```yaml
+recommended: true                       # 可选 - 列表显示橙色 ★ 推荐 标签
+hot: true                               # 可选 - 列表显示红色 热门 标签
+sort_weight: 100                        # 可选 - 排序权重，越大越靠前；默认 0
+```
+
+#### 字段说明
+
+| 字段 | 必需 | 说明 |
+|------|------|------|
+| `recommended` | optional | true 时列表应用名旁显示橙色 `★ 推荐` 标签。用于核心常用应用 |
+| `hot` | optional | true 时列表应用名旁显示红色 `热门` 标签。用于近期热门应用（可与 recommended 同时出现） |
+| `sort_weight` | optional | 整数，前端列表按此**降序**排列；同权重再按应用名升序。不声明默认 0（垫底，按名称字母序） |
+
+#### 排序规则
+
+前端列表（含分类筛选后）统一按：**`sort_weight` 降序 → 应用名升序**。
+
+整体排列遵循"用户建站的操作流程"：**Web 服务器 → 数据库 → 运行环境 → 管理工具 → AI → 其它**。
+用整百区间拉开各分类档位，分类内部用个位/十位微调顺序。
+
+#### 权重区间约定
+
+| 区间 | 分类 | 应用（标 ★ 的为该类唯一推荐） |
+|------|------|------|
+| 900 档 | Web 服务器 | **nginx ★920** / openresty 910 / apache 900 |
+| 800 档 | 数据库 | **mysql ★820** / redis 815 / mariadb 810 / postgresql 805 / mongodb 800 |
+| 700 档 | 运行环境 | **php_83 ★720** / php_82 715 / php_81 710 / php_80 705 / php_74 700 / node_22 695 / node_20 690 / python_311 685 |
+| 600 档 | 管理工具 | **phpmyadmin ★620** / adminer 615 / pgweb 610 / mongoexpress 605 / redisinsight 600 |
+| 500 档 | AI | **astrbot ★520** / ollama 515 / openwebui 510 / langbot 505 |
+| 0 | 其它 | cloudreve / uptimekuma / rabbitmq / minio / 老版本 php·node / go·java·dotnet 等（按名称排序垫底） |
+
+#### 推荐标签约定（每类一个）
+
+**`recommended: true` 每个分类只给一个**——该分类里最推荐用户安装的那一个，且它的 `sort_weight` 是本分类最高（排在分类最前）。当前 5 个推荐：nginx、mysql、php_83、phpmyadmin、astrbot。
+
+`hot` 标签当前未使用（每类一个推荐已足够清晰）。如确有近期爆款需要额外强调，可单独给某应用加 `hot: true`，但不要滥用。
+
+> **维护约定**：
+> - 新增常用应用时，在对应分类的整百区间里挑一个未占用的权重值（如新增一个数据库就用 795/812 之类）。
+> - 冷门/小众应用保持默认 0，按名称字母序排在最末，不必都设权重。
+> - 每类的 ★推荐 唯一：要把推荐换给新应用时，记得把旧推荐的 `recommended` 去掉，保证"一类一荐"。
 
 ---
 

@@ -3,6 +3,7 @@ name: PHP 7.4
 category: runtime
 description: PHP 7.4 FPM 运行环境，配合 Nginx/Apache 运行 PHP 网站
 source: official
+sort_weight: 700
 icon: icon.svg
 versions:
   - display: "7.4"

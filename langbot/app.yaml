@@ -3,6 +3,7 @@ name: LangBot
 category: ai
 description: 开源的 LLM 原生即时通讯机器人平台，支持 QQ、微信、Telegram、飞书、Discord 等，可视化 WebUI 配置
 source: official
+sort_weight: 505
 icon: icon.png
 versions:
   - display: "4.10"
@@ -10,11 +11,6 @@ versions:
     image: rockchin/langbot
     architectures: [amd64, arm64]
     is_default: true
-  - display: "latest"
-    tag: "latest"
-    image: rockchin/langbot
-    architectures: [amd64, arm64]
-    rolling: true
 default_version: "4.10"
 architectures: [amd64, arm64]
 has_web_ui: true

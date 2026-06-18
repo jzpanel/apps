@@ -3,6 +3,7 @@ name: Node.js 22
 category: runtime
 description: Node.js 22 运行环境（容器化，最新 LTS，供 Node 网站使用，无需在宿主机安装）
 source: official
+sort_weight: 695
 icon: icon.svg
 runtime_type: node
 versions:

@@ -3,6 +3,8 @@ name: Nginx
 category: runtime
 description: 高性能 HTTP 服务器和反向代理，面板网站管理的核心组件
 source: official
+recommended: true
+sort_weight: 920
 icon: icon.svg
 versions:
   - display: "1.27"

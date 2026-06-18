@@ -3,6 +3,8 @@ name: PHP 8.3
 category: runtime
 description: PHP 8.3 FPM 运行环境，支持最新特性，配合 Nginx/Apache 运行 PHP 网站
 source: official
+recommended: true
+sort_weight: 720
 icon: icon.svg
 versions:
   - display: "8.3"

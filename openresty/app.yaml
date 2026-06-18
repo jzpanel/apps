@@ -3,6 +3,7 @@ name: OpenResty
 category: runtime
 description: 基于 Nginx 的高性能 Web 平台，内置 LuaJIT，支持动态 Web 应用开发
 source: official
+sort_weight: 910
 icon: icon.svg
 versions:
   - display: "1.27"

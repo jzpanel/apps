@@ -3,6 +3,7 @@ name: MariaDB
 category: database
 description: MySQL 的社区分支，完全兼容 MySQL 协议，性能优异，开源程序广泛支持
 source: official
+sort_weight: 810
 icon: icon.svg
 versions:
   - display: "11.4"

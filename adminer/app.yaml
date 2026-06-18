@@ -3,6 +3,7 @@ name: Adminer
 category: tools
 description: 轻量级全能数据库管理工具，单文件设计，支持 MySQL、MariaDB、PostgreSQL、SQLite、MongoDB 等
 source: official
+sort_weight: 615
 icon: icon.png
 versions:
   - display: "5"

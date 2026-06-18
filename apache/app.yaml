@@ -3,6 +3,7 @@ name: Apache
 category: runtime
 description: 世界上使用最广泛的 Web 服务器，支持 .htaccess 动态配置
 source: official
+sort_weight: 900
 icon: icon.svg
 versions:
   - display: "2.4"

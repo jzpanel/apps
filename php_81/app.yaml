@@ -3,6 +3,7 @@ name: PHP 8.1
 category: runtime
 description: PHP 8.1 FPM 运行环境，配合 Nginx/Apache 运行 PHP 网站
 source: official
+sort_weight: 710
 icon: icon.svg
 versions:
   - display: "8.1"

@@ -3,6 +3,7 @@ name: Python 3.11
 description: Python 3.11 运行环境（容器化，内置 gunicorn/uvicorn，供 Python 网站使用，无需在宿主机安装）
 category: runtime
 source: official
+sort_weight: 685
 icon: icon.svg
 runtime_type: python
 versions:

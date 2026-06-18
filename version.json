@@ -1,5 +1,5 @@
 {
   "version": "1.0.23",
-  "updated_at": "2026-06-13T06:32:53Z",
-  "changelog": "本次更新涉及 6 个应用：mongodb, mongoexpress, mysql, phpmyadmin, postgresql, redis。详见 git log。"
+  "updated_at": "2026-06-18T00:00:00Z",
+  "changelog": "更新 31 个应用配置（补充 recommended/sort_weight 等元数据），更新 astrbot、openclaw 图标。"
 }

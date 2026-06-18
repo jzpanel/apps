@@ -3,6 +3,7 @@ name: RedisInsight
 category: tools
 description: Redis 官方 Web 管理工具，支持键值浏览、命令执行、性能监控、慢日志分析
 source: official
+sort_weight: 600
 icon: icon.svg
 versions:
   - display: "3.4"
