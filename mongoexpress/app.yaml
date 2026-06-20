@@ -29,17 +29,6 @@ params:
     type: number
     default: 8081
     required: true
-  - key: admin_username
-    label: Web 界面用户名
-    type: text
-    default: admin
-    required: true
-  - key: admin_password
-    label: Web 界面密码
-    type: password
-    default: ""
-    required: true
-    auto_generate: true
 
 compose_vars:
   - placeholder: "{{me_mongodb_url}}"
@@ -87,7 +76,8 @@ manage:
 
 install_hints:
   - "通过浏览器访问 http://服务器IP:端口 进入管理界面"
-  - "使用安装时设置的用户名密码登录"
+  - "已自动连接面板 MongoDB（打开即用，无需配置）"
+  - "默认仅面板内访问；如需公网访问，在「外部访问」开关处设置访问密码"
 
 resource_limits:
   memory_mb: 128
@@ -104,12 +94,11 @@ proxy_spec:
   ws_support: false
   description: "通过域名访问 Mongo Express，建议配置 HTTPS 保护数据库管理界面"
 
-# Web 访问控制：Mongo Express 自带 Basic Auth 登录
+# Web 访问控制：Mongo Express 自身 Basic Auth 体验差（浏览器原生弹窗），
+# 改走面板内置「表单登录」反代（auth=none），与 pgweb/redisinsight 统一。
 web_access:
-  auth: builtin
+  auth: none
   console_port_param: port
-  username_param: admin_username
-  password_param: admin_password
 
 install_guide:
   description: "Mongo Express 已安装，可以通过浏览器管理 MongoDB："

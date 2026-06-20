@@ -7,8 +7,6 @@ services:
       - "{{port}}:8081"
     environment:
       ME_CONFIG_MONGODB_URL: "{{me_mongodb_url}}"
-      ME_CONFIG_BASICAUTH_USERNAME: "{{admin_username}}"
-      ME_CONFIG_BASICAUTH_PASSWORD: "{{admin_password}}"
       ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
     networks:
       - panel_network

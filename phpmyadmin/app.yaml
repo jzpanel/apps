@@ -35,7 +35,7 @@ compose_vars:
   - placeholder: "{{pma_hosts}}"
     source: db_instance_hosts
     registry_type: mysql
-    empty_value: "panel_mysql_80"
+    empty_value: "panel_mysql"
 
 manage: []
 
@@ -45,7 +45,8 @@ init_files:
 
 install_hints:
   - "通过浏览器访问 http://服务器IP:端口 进入管理界面"
-  - "使用 MySQL root 账号登录"
+  - "服务器地址已自动锁定（连接面板的数据库容器），登录页只需填数据库账号和密码"
+  - "MySQL 默认管理账号为 root，密码见「数据库 → 设置密码」"
 
 resource_limits:
   memory_mb: 256

@@ -8,7 +8,9 @@ services:
     environment:
       PMA_HOSTS: "{{pma_hosts}}"
       PMA_PORT: 3306
-      PMA_ARBITRARY: 1
+      # 锁定服务器地址：只允许连接面板注册的数据库容器（PMA_HOSTS），
+      # 登录页不显示"服务器"输入框，用户只填账号密码，避免填错地址（如 127.0.0.1 连不上）。
+      PMA_ARBITRARY: 0
       UPLOAD_LIMIT: 256M
     volumes:
       - /www/server/phpmyadmin/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php

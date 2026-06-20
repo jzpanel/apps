@@ -1,5 +1,5 @@
 {
   "version": "1.0.24",
-  "updated_at": "2026-06-18T05:37:45Z",
-  "changelog": "本次更新涉及 29 个应用：adminer, apache, astrbot, langbot, mariadb, memcached, minio, mongodb, mongoexpress, mysql, nginx, node_20, node_22, ollama, openclaw, openresty, openwebui, pgweb, php_74, php_80, php_81, php_82, php_83, phpmyadmin, postgresql, pureftpd, python_311, redis, redisinsight。详见 git log。"
+  "updated_at": "2026-06-20T00:00:00Z",
+  "changelog": "数据库管理工具访问控制调整：mongoexpress 安装免密、外部访问改面板表单登录反代；phpmyadmin / redisinsight 外部访问配置完善；adminer 元数据更新；补充应用编写指南文档。"
 }

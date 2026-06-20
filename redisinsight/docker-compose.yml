@@ -5,6 +5,13 @@ services:
     restart: unless-stopped
     ports:
       - "{{port}}:5540"
+    environment:
+      # 预配置一个连接（打开即连好面板的 Redis，无需手动添加）
+      # 地址用容器名 panel_redis（同 panel_network），端口用容器内 6379
+      RI_REDIS_HOST: panel_redis
+      RI_REDIS_PORT: 6379
+      RI_REDIS_ALIAS: "面板 Redis"
+      RI_REDIS_PASSWORD: "{{ri_redis_password}}"
     volumes:
       - /www/server/redisinsight/data:/data
     networks:

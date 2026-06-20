@@ -31,7 +31,7 @@ manage: []
 
 install_hints:
   - "通过浏览器访问 http://服务器IP:端口 进入管理界面"
-  - "登录页填写数据库连接信息：连面板 MySQL 服务器填 panel_mysql_80、MariaDB 填 panel_mariadb、PostgreSQL 填 panel_postgresql（同 panel_network）"
+  - "登录页「服务器」填数据库容器名（同 panel_network）：MySQL 填 panel_mysql、MariaDB 填 panel_mariadb、PostgreSQL 填 panel_postgresql"
   - "支持 MySQL、MariaDB、PostgreSQL、SQLite、MongoDB 等多种数据库"
 
 resource_limits:

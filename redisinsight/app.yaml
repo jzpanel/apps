@@ -25,6 +25,16 @@ params:
     default: 8085
     required: true
 
+# 预配置连接：从服务注册表读取 Redis 密码注入 RI_REDIS_PASSWORD
+# 用 registry_password_raw（不 URL 编码，因为这是普通环境变量不是 URL）
+# Redis 未设密码时为空字符串（RedisInsight 走无密码连接）
+compose_vars:
+  - placeholder: "{{ri_redis_password}}"
+    source: registry_password_raw
+    registry_type: redis
+    template: "{{password}}"
+    empty_value: ""
+
 # RedisInsight 容器以 UID 1000 运行，预创建并 chown 数据目录
 volumes_init:
   - path: /www/server/redisinsight/data
@@ -36,8 +46,8 @@ manage: []
 
 install_hints:
   - "通过浏览器访问 http://服务器IP:端口 进入管理界面"
-  - "首次进入需手动添加 Redis 连接：主机填 panel_redis、端口 6379（与面板 Redis 同网络）"
-  - "如 Redis 设了密码，连接时一并填写"
+  - "已自动预配置面板 Redis 连接（打开即用，无需手动添加）"
+  - "如需连接其它 Redis，可在界面中手动添加：主机填 panel_redis、端口 6379"
 
 resource_limits:
   memory_mb: 256

@@ -507,10 +507,20 @@ web_access:
 
 | auth | 含义 | 行为 |
 |------|------|------|
-| `builtin` | 应用自带登录认证（MinIO/RabbitMQ） | 默认绑 127.0.0.1；用户可在管理抽屉手动开"外部访问"；展示用户名/密码 |
-| `none` | 应用无任何登录认证（RedisInsight） | 默认绑 127.0.0.1；"外部访问"开关置灰禁用，**只能通过面板代理访问** |
+| `builtin` | 应用自带登录页（MinIO/RabbitMQ/phpMyAdmin 等） | 默认绑 127.0.0.1；可在管理抽屉手动开"外部访问"（改 compose 端口绑定 + 重建容器），靠工具自身登录页保护；展示用户名/密码 |
+| `none` | 应用无可用登录（RedisInsight/pgweb/Mongo Express） | 默认绑 127.0.0.1；可开"外部访问"，由**面板内置「表单登录」反代**保护（开启时强制设访问密码），容器不动不重建 |
 
 **默认值**：未声明 `web_access` 时，`has_web_ui` 应用按 `auth: none` 处理（最安全，强制只能面板访问）。
+
+**`auth: none` 的外部访问机制（面板表单登录反代）：**
+
+适用于自身无登录、或自带登录体验差（如 Mongo Express 的浏览器原生 Basic Auth 弹窗）的工具。
+开启外部访问时：
+- 容器**始终绑 127.0.0.1 不动**（不改 compose、不重建容器，开关零停机）。
+- 面板在本机网卡 IP 的同端口起反代：未登录 → 返回面板统一的好看 HTML 表单登录页；
+  登录通过 → 种 session cookie → 透明反代到容器。
+- 用户在管理抽屉点"外部访问"开关 → 前端弹窗设访问用户名+密码（可随机生成），bcrypt 存储。
+- **app 作者无需任何额外配置**：声明 `auth: none`（或不写 web_access）即可，compose 不用加任何认证变量。
 
 **管理抽屉表现**：`has_web_ui` 应用的「概览」tab 会显示「访问信息」卡片：
 - 「打开」按钮（经面板代理访问，复用面板登录态鉴权）
@@ -947,6 +957,44 @@ networks:
 ```
 
 > ⚠️ **常见错误**：把 PHP-FPM 放进 `panel_network` 会导致用户在 WordPress/Laravel 等源码的数据库配置里填 `localhost` 或 `127.0.0.1` 时连接失败。这是一个不易发现的问题，因为 PHP 容器本身运行正常，只有用户实际配置应用时才会报错。
+
+#### bridge 容器应用连数据库的两种正确方式
+
+全容器化应用（自己跑在 bridge 网络里，需要连面板的 MySQL/PostgreSQL 等）**不能用 `127.0.0.1`**（bridge 容器的 127 指向容器自己）。有两种正确写法：
+
+**方式 A（推荐，最直接）：加入 `panel_network`，用数据库容器名连接**
+
+```yaml
+services:
+  myapp:
+    image: ...
+    environment:
+      DB_HOST: panel_mysql        # 数据库容器名
+      DB_PORT: 3306               # 容器内端口固定 3306（不是宿主机映射端口）
+    networks:
+      - panel_network
+networks:
+  panel_network:
+    external: true
+    name: panel_network
+```
+
+**方式 B：用 `host.docker.internal` 经宿主机网关连接（适合不便加入 panel_network 的应用）**
+
+```yaml
+services:
+  myapp:
+    image: ...
+    environment:
+      DB_HOST: host.docker.internal   # 解析到宿主机网关
+      DB_PORT: "{{宿主机映射端口}}"     # 用宿主机映射端口（如 3306）
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # 必需：让容器内 host.docker.internal 解析到网关
+```
+
+> `host-gateway` 由 Docker 引擎动态解析到 docker0 网关（通常 172.17.0.1），**不受用户自定义 docker 网段影响**，比硬编码 IP 更健壮。实测两种方式都能成功连接（含真实认证）。
+>
+> **方式 A 用容器内端口 3306**（容器名直连容器，走内部端口）；**方式 B 用宿主机映射端口**（经网关走宿主机暴露的端口）。两者端口语义不同，别混。
 
 ### 路径约定
 
