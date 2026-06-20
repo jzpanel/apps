@@ -4,7 +4,7 @@
 
 > 维护者：核心团队
 > 适用范围：jzpanel/apps 仓库下所有应用
-> 版本：v1.1（2026-06-14）
+> 版本：v1.4（2026-06-20）
 > 关联：spec/app-image-version-reliability
 
 ---
@@ -92,15 +92,21 @@ icon: icon.svg                        # 必需 - 图标文件名（与同级 ico
 
 #### `category` 合法值
 
+`category` 仅用于前端筛选分组，是自由文本（后端不强校验枚举）。当前仓库实际在用的值：
+
 | 值 | 含义 | 例 |
 |----|------|-----|
-| `runtime` | Web 服务器 / 运行时 | nginx, openresty, apache, php_* |
+| `runtime` | Web 服务器 / 语言运行时 | nginx, openresty, apache, php_*, node_*, python_* |
 | `database` | 数据库 | mysql, postgresql, mongodb, redis |
-| `tool` | 管理工具 | phpmyadmin, pgweb, mongoexpress |
-| `service` | 后台服务 / 网络 | pureftpd, ssh-bastion |
-| `cms` | 应用程序（一般用户面） | wordpress |
+| `tools` | 管理工具 | phpmyadmin, adminer, pgweb, mongoexpress, redisinsight |
+| `middleware` | 中间件 / 后台服务 | minio, rabbitmq, memcached |
+| `ai` | AI 相关 | astrbot, ollama, openwebui, langbot |
+| `utility` | 杂项工具 | cloudreve, uptimekuma 等 |
 
-> **重要**：`category: database` 会激活两个特殊行为：
+> 注意：是 `tools`（复数）不是 `tool`。新增应用时优先复用上述已有值，保持前端分组一致；确需新分类再新增。
+> `category` 与 `service_type` 是两回事：`category` 只影响前端分组展示，`service_type` 才驱动安装/卸载行为（见下）。
+
+> **重要**：真正激活"数据库特殊行为"的是 **`service_type: database`**（不是 `category`）：
 > - 安装时清空数据目录（确保 init password 生效）
 > - 平滑迁移时强制要求用户勾选"已知晓数据兼容风险"
 
@@ -544,7 +550,7 @@ web_access:
 
 ---
 
-### 管理抽屉（manage / actions / tabs / php_extensions）
+### 管理抽屉（manage / actions / tabs / extensions）
 
 #### `manage` —— 配置管理
 
@@ -723,16 +729,44 @@ tabs:
 
 未声明 `tabs` 时使用默认 tab 集合。
 
-#### `php_extensions` —— PHP 扩展
+#### `extensions` —— 应用扩展（PHP 等）
 
-仅 PHP 应用使用。驱动 PHP 管理抽屉的"扩展"tab。
+驱动管理抽屉的"扩展"tab。当前用 `extensions:`（旧的 `php_extensions:` + `install_command:` 已废弃，代码里 `PHPExtension` 标记 Deprecated，新应用一律用 `extensions`）。
 
 ```yaml
-php_extensions:
-  - name: gd
-    label: GD 图形库
-    install_command: "docker-php-ext-install gd"
+extensions:
+  - name: redis              # 扩展名（installer=ipe 时即包名）
+    label: Redis             # 显示名
+    installer: ipe           # 安装器：ipe / apk / apt / shell
+  - name: ioncube
+    label: ionCube Loader
+    installer: shell         # shell 时用 command 写完整命令
+    command: "curl -fsSL ... && ..."
+  - name: some_pkg
+    label: 某扩展
+    installer: apk           # 包名与 name 不同时用 package 指定
+    package: real-pkg-name
 ```
+
+##### `installer` 取值
+
+| 值 | 含义 | 适用 |
+|----|------|------|
+| `ipe` | `install-php-extensions`（PHP 官方扩展安装器） | PHP 扩展首选，扩展名即包名，无需 `package` |
+| `apk` | Alpine `apk add` | Alpine 基础镜像的系统包 |
+| `apt` | Debian/Ubuntu `apt-get install` | Debian 系镜像的系统包 |
+| `shell` | 执行 `command` 字段的完整 shell 命令 | 非标准安装（如 ionCube 手动下载） |
+| `pip` / `npm` | 预留，当前返回未实现错误 | — |
+
+##### 字段说明
+
+| 字段 | 必需 | 说明 |
+|------|------|------|
+| `name` | ✓ | 扩展名。`installer=ipe` 时即包名 |
+| `label` | ✓ | 显示名 |
+| `installer` | ✓ | `ipe` / `apk` / `apt` / `shell` |
+| `package` | optional | 包名与 `name` 不同时填写；`installer=ipe` 时忽略 |
+| `command` | shell 必需 | 仅 `installer=shell` 时使用，完整 shell 命令 |
 
 ---
 
@@ -891,7 +925,7 @@ networks:
 | 类型 | 应用 | 原因 |
 |------|------|------|
 | **Web 服务器** | nginx, openresty, apache | 直接监听宿主机 80/443，端口转发最小延迟 |
-| **PHP-FPM** | php_74, php_80, php_81, php_82, php_83 | PHP 代码需要用 `localhost`/`127.0.0.1` 连接 MySQL/Redis（与宝塔/1Panel 行为一致） |
+| **PHP-FPM** | php_74, php_80, php_81, php_82, php_83 | PHP 代码需要用 `localhost`/`127.0.0.1` 连接 MySQL/Redis
 | **FTP 服务器** | pureftpd | 被动模式（PASV）必须通告宿主机真实 IP，bridge 网络下 PUBLICHOST 无法正确工作 |
 
 ```yaml
@@ -1565,7 +1599,7 @@ reload_cmd: "openresty -s reload"
 | `manage[]` | list | optional | 管理配置项（含 format、bool_format 子字段） |
 | `actions[]` | list | optional | 操作按钮 |
 | `tabs[]` | list | optional | tab 顺序 |
-| `php_extensions[]` | list | PHP only | PHP 扩展 |
+| `extensions[]` | list | optional | 应用扩展（installer: ipe/apk/apt/shell）；旧 `php_extensions[]` 已废弃 |
 | `init_files[]` | list | optional | 初始化文件 |
 | `volumes_init[]` | list | 非 root 镜像必需 | 挂载目录 chown |
 | `compose_vars[]` | list | optional | 动态占位符 |
@@ -1593,9 +1627,10 @@ reload_cmd: "openresty -s reload"
 
 ## 文档维护
 
-本文档版本：v1.3（2026-06-07）
+本文档版本：v1.4（2026-06-20）
 
 修改历史：
+- v1.4 — 修正多处过时内容：① `extensions[]`（installer: ipe/apk/apt/shell）取代已废弃的 `php_extensions[]`/`install_command`；② `category` 合法值更新为仓库实际在用的 runtime/database/tools/middleware/ai/utility（旧的 tool/service/cms 已不用），并澄清"数据库特殊行为由 service_type=database 触发而非 category"；③ 顶部版本号与底部维护记录统一；④ 附录字段速查表同步
 - v1.3 — 新增常见错误 #10~#15（PHP fpm_port 移除、manage 必须有 file_path、MySQL innodb_log_file_size 移除、compose 挂载文件必须有 init_files、default_version 不应用 rolling tag、EOL 版本标 deprecated）；更新附录 B 移除 wordpress 参考（已从 apps-repo 删除）
 - v1.2 — 新增网络模式规范（host vs panel_network 完整决策树）；新增常见错误 #9（PHP localhost 连不上 MySQL）；更正 docker-compose 模板规范中"所有应用必须挂 panel_network"的错误表述
 - v1.1 — 新增 `bool_format` 字段说明（manage → type: switch 必填）；新增 `format` 字段说明；新增常见错误 #8
