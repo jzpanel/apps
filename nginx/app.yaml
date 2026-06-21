@@ -36,11 +36,13 @@ params:
     type: number
     default: 80
     required: true
+    expose: public
   - key: https_port
     label: HTTPS 端口
     type: number
     default: 443
     required: true
+    expose: public
 
 manage:
   - key: worker_processes

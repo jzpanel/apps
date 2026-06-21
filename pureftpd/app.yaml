@@ -21,16 +21,19 @@ params:
     type: number
     default: 21
     required: true
+    expose: public
   - key: passive_port_start
     label: 被动模式端口起始
     type: number
     default: 30000
     required: true
+    expose: public
   - key: passive_port_end
     label: 被动模式端口结束
     type: number
     default: 30100
     required: true
+    expose: public
 
 manage:
   - key: MaxClientsNumber

@@ -21,6 +21,10 @@ params:
     type: number
     default: 9000
     required: true
+    # public 例外：MinIO 控制台(9001)在浏览器侧会直接调用 S3 API(9000) 的绝对地址，
+    # 面板代理只能反代单端口，故 API 必须可直达浏览器，否则控制台无法工作。
+    # 这是有 Web 控制台依赖其数据端口的特例；其余服务（含 rabbitmq AMQP）一律默认 local。
+    expose: public
   - key: console_port
     label: 控制台端口（Web 管理界面）
     type: number

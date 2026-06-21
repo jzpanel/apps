@@ -236,6 +236,39 @@ params:
 
 **约定**：端口字段命名 `port` / `http_port` / `https_port` / `fpm_port` / `ftp_port` 等。
 
+#### 端口暴露策略 `expose`（默认安全）
+
+端口参数（`type: number` 且 key 含 `port`）可声明 `expose`，控制安装后端口是否对公网开放：
+
+```yaml
+params:
+  - key: http_port
+    label: HTTP 端口
+    type: number
+    default: 80
+    required: true
+    expose: public      # public | local（默认，可省略）
+```
+
+| expose | 行为 |
+|--------|------|
+| `public` | bridge 端口绑 `0.0.0.0`（对公网开放）+ 自动放行防火墙；host 网络模式应用放行防火墙 |
+| `local`（**默认，含不写**） | bridge 端口绑 `127.0.0.1`（仅本机/面板代理可访问）+ **不**放行防火墙 |
+
+**默认安全**：不写 `expose` 一律按 `local`，新增应用忘标也不会裸奔公网。
+
+**只有这两类标 `public`**：
+- Web 服务器（nginx/openresty/apache）的 `http_port` / `https_port`
+- FTP（pureftpd）的 `ftp_port` 及被动端口
+
+**数据库、缓存、消息队列、管理工具等一律不写 expose**（默认 local）。用户需要远程访问时，
+在管理抽屉「外部访问」开关里手动开启（面板会弹风险提示 + 二次确认，但不强制密码，决定权归用户）。
+
+> 为什么默认 local 是真的安全：Docker 发布 `0.0.0.0` 桥接端口的 DNAT 规则绕过 firewalld/ufw 的
+> INPUT 过滤，所以「放不放行防火墙」对桥接端口几乎无效——**真正决定暴露的是 bind 地址**。
+> `expose: local` 让端口绑 `127.0.0.1`，是唯一可靠的不暴露方式。
+> host 网络模式应用（webserver/ftp）没有 Docker DNAT，防火墙才是其控制点，靠 `expose: public` 放行。
+
 #### auto_generate 与敏感字段
 
 ```yaml
