@@ -59,6 +59,6 @@ RUN rm -rf /var/cache/apk/*
 # 移除官方镜像 zz-docker.conf 的 listen=9000（它按字母序在 www.conf 之后加载，
 # 会覆盖面板挂载的 php-fpm.conf 的 listen，导致所有 PHP 版本都绑 9000 互相冲突）。
 # 仅保留 daemonize=no（容器前台运行必需），监听端口完全由挂载的 php-fpm.conf 决定。
-RUN printf '[global]\ndaemonize = no\n' > /usr/local/etc/php-fpm.d/zz-docker.conf
+RUN mkdir -p /usr/local/etc/php-fpm.d && printf '[global]\ndaemonize = no\n' > /usr/local/etc/php-fpm.d/zz-docker.conf
 
 CMD ["php-fpm"]
