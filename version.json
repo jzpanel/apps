@@ -1,5 +1,5 @@
 {
-  "version": "1.0.26",
-  "updated_at": "2026-06-21T03:00:00Z",
-  "changelog": "PHP 运行时端口修复：9 个版本镜像移除 zz-docker.conf 的 listen=9000 覆盖（保留 daemonize=no），php-fpm.conf 监听端口改为 {{fpm_port}} 占位符，安装时支持自定义 FPM 端口，多版本可真正共存。"
+  "version": "1.0.27",
+  "updated_at": "2026-06-21T03:29:04Z",
+  "changelog": "本次更新涉及 9 个应用：php_54, php_55, php_56, php_70, php_74, php_80, php_81, php_82, php_83。详见 git log。"
 }
