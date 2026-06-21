@@ -1,5 +1,5 @@
 {
-  "version": "1.0.27",
-  "updated_at": "2026-06-21T03:29:04Z",
-  "changelog": "本次更新涉及 9 个应用：php_54, php_55, php_56, php_70, php_74, php_80, php_81, php_82, php_83。详见 git log。"
+  "version": "1.0.28",
+  "updated_at": "2026-06-21T11:20:51Z",
+  "changelog": "本次更新涉及 5 个应用：apache, minio, nginx, openresty, pureftpd。详见 git log。"
 }
