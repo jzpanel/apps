@@ -17,8 +17,14 @@ service_type: php
 has_web_ui: false
 health_check_timeout: 30
 
-# host 网络模式下监听端口由 php-fpm.conf 的 listen 字段决定（固定为 9054）
-params: []
+# FPM 监听端口：写入挂载的 php-fpm.conf 的 listen 字段，供 Nginx/Apache 通过 fastcgi_pass 连接。
+# host 网络模式直接监听宿主机端口；多个 PHP 版本共存时各版本端口须互不相同。
+params:
+  - key: fpm_port
+    label: FPM 监听端口
+    type: number
+    default: 9054
+    required: true
 
 manage:
   - key: memory_limit
