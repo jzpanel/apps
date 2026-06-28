@@ -7,7 +7,7 @@ FROM jzpanel/php:5.4-fpm-base
 # 必须把 sources.list 指向归档源，并关闭有效期校验（归档源 Release 文件已过期），否则 apt-get 全部 404。
 RUN set -eux; \
     printf 'deb http://archive.debian.org/debian jessie main\ndeb http://archive.debian.org/debian-security jessie/updates main\n' > /etc/apt/sources.list; \
-    printf 'Acquire::Check-Valid-Until "false";\n' > /etc/apt/apt.conf.d/99no-check-valid; \
+    printf 'Acquire::Check-Valid-Until "false";\nAcquire::Retries "8";\n' > /etc/apt/apt.conf.d/99no-check-valid; \
     apt-get update
 
 # 编译工具链 + 系统依赖（Debian Jessie 包名）

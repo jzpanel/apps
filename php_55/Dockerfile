@@ -8,7 +8,7 @@ FROM jzpanel/php:5.5-fpm-base
 # php:5.5-fpm 基于 Debian Jessie，Jessie 已 EOL 且 apt 源已归档到 archive.debian.org。
 RUN set -eux; \
     printf 'deb http://archive.debian.org/debian jessie main\ndeb http://archive.debian.org/debian-security jessie/updates main\n' > /etc/apt/sources.list; \
-    printf 'Acquire::Check-Valid-Until "false";\n' > /etc/apt/apt.conf.d/99no-check-valid; \
+    printf 'Acquire::Check-Valid-Until "false";\nAcquire::Retries "8";\n' > /etc/apt/apt.conf.d/99no-check-valid; \
     apt-get update
 
 # 编译工具链 + 系统依赖（Debian Jessie 包名）
