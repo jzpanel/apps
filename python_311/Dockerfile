@@ -10,8 +10,11 @@ RUN apt-get update \
     && pip install --no-cache-dir gunicorn uvicorn \
     && rm -rf /var/lib/apt/lists/*
 
-# 国内 pip 源（用户可在网站环境变量覆盖）
-ENV PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
+# 注意：不在镜像里烤死 pip 国内源（PIP_INDEX_URL）。
+# 是否走国内镜像由面板按「网络环境探测 + 用户设置」动态决定：
+# 大陆/受限网络安装依赖时面板会用 docker exec -e PIP_INDEX_URL=... 注入国内源；
+# 国际网络通畅（境外服务器）则走官方 pypi.org，避免被强制走国内源反而更慢。
+# 用户也可在网站「环境变量」里自行设置 PIP_INDEX_URL 覆盖。
 
 COPY init/supervisord.conf /etc/supervisor/supervisord.conf
 
