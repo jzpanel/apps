@@ -4,7 +4,8 @@ FROM python:3.11-slim
 # 面板通过挂载的 /etc/supervisor/conf.d 写入每个网站的 program 配置，
 # 再 docker exec supervisorctl reread/update 启动对应网站进程。
 # 用 slim（Debian）而非 alpine：Python C 扩展（如 cryptography、psycopg2）在 alpine 上常需源码编译，slim 兼容性更好。
-RUN apt-get update \
+RUN printf 'Acquire::Retries "8";\n' > /etc/apt/apt.conf.d/80-retries \
+    && apt-get update \
     && apt-get install -y --no-install-recommends supervisor curl tini \
     && mkdir -p /etc/supervisor/conf.d /var/log/supervisor \
     && pip install --no-cache-dir gunicorn uvicorn \
