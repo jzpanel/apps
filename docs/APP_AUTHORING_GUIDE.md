@@ -4,7 +4,7 @@
 
 > 维护者：核心团队
 > 适用范围：jzpanel/apps 仓库下所有应用
-> 版本：v1.4（2026-06-20）
+> 版本：v1.5（2026-06-29）
 > 关联：spec/app-image-version-reliability
 
 ---
@@ -47,6 +47,13 @@
 ### 4. 国内可用
 
 所有镜像必须能从 jzpanel 镜像加速地址（`docker.jzpanel.top` 等）拉到。如果上游只发布到 ghcr.io 等小众仓库，需要先沟通。
+
+**镜像加速由面板按网络环境自适应处理，不要在镜像/应用里烤死国内源**：
+
+- **Docker 镜像拉取**：面板按「网络环境探测 + 用户的镜像加速模式」决定走国内加速还是直连官方（大陆/受限走加速、境外直连），全部失败再兜底直连。app 作者只需保证镜像在加速地址能拉到，无需自己处理。
+- **自建运行时/基础镜像的 Dockerfile（如 `go_122`/`python_311`/`node_*` 这类语言运行时）**：**禁止**在 Dockerfile 里写死国内包管理器源（`ENV GOPROXY=goproxy.cn`、`ENV PIP_INDEX_URL=tuna`、`npm config set registry npmmirror` 等）。面板会在装依赖/跑进程时按网络环境用 `docker exec -e`/supervisor 环境变量动态注入国内源（大陆）或走官方源（境外）。烤死国内源会让境外服务器被迫走国内源、反而更慢。
+- **容器内 apt/apk 系统源**（扩展安装 `installer: apt`/`apk` 等场景）：面板安装时按网络环境自动切换为最快的国内镜像（大陆）或保持官方源（境外），作者无需在 `command` 里手动换源。
+- **Debian/apt 基础镜像的 Dockerfile**：`apt-get` 易受 CI 多架构构建（QEMU）网络抖动影响，统一在 `RUN` 前写 `printf 'Acquire::Retries "8";\n' > /etc/apt/apt.conf.d/80-retries` 让 apt 自动重试（不要加 `--fix-missing`，避免真缺包时假装成功）。
 
 ---
 
